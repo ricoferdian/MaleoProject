@@ -52,13 +52,19 @@ class MainWindow(QMainWindow):
         self.tab5 = AttributeTab(self, screenHeight, screenWidth)
         self.tab6 = VisualizationTab(self, screenHeight, screenWidth)
 
-        self.tabs.resize(300,200)
+        self.tabs.resize(500,200)
         self.tabs.addTab(self.tab1, "Preprocessing")
         self.tabs.addTab(self.tab2, "Klasifikasi")
         self.tabs.addTab(self.tab3, "Clustering")
         self.tabs.addTab(self.tab4, "Asosiasi")
         self.tabs.addTab(self.tab5, "Pilih Atribut")
         self.tabs.addTab(self.tab6, "Visualisasi")
+
+        self.tabs.setTabEnabled(1,False)
+        self.tabs.setTabEnabled(2,False)
+        self.tabs.setTabEnabled(3,False)
+        self.tabs.setTabEnabled(4,False)
+        self.tabs.setTabEnabled(5,False)
 
         self.tab1.dataModelSignal.connect(self.updateDataModel)
 
@@ -70,13 +76,43 @@ class MainWindow(QMainWindow):
         self.data = self.dataModel.getData()
         self.header = self.dataModel.getHeaders()
 
-# Run main program
-if __name__ == '__main__':
+        self.tabs.setTabEnabled(1,True)
+        self.tabs.setTabEnabled(2,True)
+        self.tabs.setTabEnabled(3,True)
+        self.tabs.setTabEnabled(4,True)
+        self.tabs.setTabEnabled(5,True)
+
+        self.updateChildDataModel(self.dataModel)
+
+    def updateChildDataModel(self, dataModel):
+        self.updateClassificationDataModel(dataModel)
+        # self.updateClusteringDataModel(dataModel)
+        # self.updateAssociationDataModel(dataModel)
+        # self.updateAttributeDataModel(dataModel)
+        # self.updateVisualizationDataModel(dataModel)
+
+    def updateClassificationDataModel(self, dataModel):
+        self.tab2.loadData(dataModel)
+
+    def updateClusteringDataModel(self, dataModel):
+        self.tab3.loadData(dataModel)
+
+    def updateAssociationDataModel(self, dataModel):
+        self.tab4.loadData(dataModel)
+
+    def updateAttributeDataModel(self, dataModel):
+        self.tab5.loadData(dataModel)
+
+    def updateVisualizationDataModel(self, dataModel):
+        self.tab6.loadData(dataModel)
+
+def runMainWindow():
     global screenWidth
     global screenHeight
 
     app = QApplication(sys.argv)
     app.setApplicationName("Maleo Workbench")
+    app.setAttribute(Qt.AA_DisableWindowContextHelpButton)
 
     screen = app.primaryScreen()
     size = screen.size()
@@ -86,3 +122,8 @@ if __name__ == '__main__':
 
     window = MainWindow()
     app.exec_()
+
+
+# Run main program
+if __name__ == '__main__':
+    runMainWindow()

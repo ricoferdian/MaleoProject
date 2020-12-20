@@ -19,25 +19,18 @@ Udayana University, Bali, Indonesia
 This part of python program consist of the visualization tab from main GUI application
 """
 
-import pandas as pd
-import csv
+class ClassifierModel():
+    def __init__(self,classifier, *args):
+        self.classifier = classifier
 
-class CSVLoader():
-    def __init__(self,path, *args):
-        self.path = path
-        self.data = None
-        self.header = None
-        self.loadData()
+    def getName(self):
+        return self.classifier.getName()
 
-    def loadData(self):
-        try:
-            self.data = pd.read_csv(self.path)
-            self.header = list(self.data.columns)
-        except Exception as e:
-            print("Error exception : ",e)
+    def getModel(self):
+        return self.classifier
 
-    def getHeaders(self):
-        return self.header
+    def start(self):
+        self.classifier.startOperation()
 
-    def getData(self):
-        return self.data
+    def stop(self):
+        self.classifier.stopOperation()

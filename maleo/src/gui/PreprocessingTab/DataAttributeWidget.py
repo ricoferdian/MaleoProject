@@ -34,8 +34,6 @@ import csv
 
 # GUI Table View Library
 from maleo.src.utils.TableView import TableView
-from maleo.src.utils.CSVLoader import CSVLoader
-from maleo.src.model.CSVDataModel import CSVDataModel
 
 class DataAttributeWidget(QWidget):
     def __init__(self, parent):
@@ -86,7 +84,6 @@ class DataAttributeWidget(QWidget):
         self.dataModel = dataModel
         self.data = self.dataModel.getData()
         self.header = self.dataModel.getHeaders()
-        print("LOAD DATA HEADER",self.header)
         if(len(self.header)):
             # Transform
             self.header = {"Name":{i:self.header[i] for i in range(len(self.header))}}
@@ -96,13 +93,14 @@ class DataAttributeWidget(QWidget):
 
             self.drawTable(self.header, len(self.header[first_key]), len(self.header))
         else:
-            self.dataAttributeTable = TableView({},0,0)
+            self.drawTable({}, 0 ,0)
 
 
     def drawTable(self,data,row, col):
         self.dataAttributeTable.updateParameter(col,row)
         self.dataAttributeTable.updateData(data)
-        self.dataAttributeTable.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.dataAttributeTable.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)
+        self.dataAttributeTable.horizontalHeader().setStretchLastSection(True)
 
     def selectAll(self):
         for row in range(self.dataAttributeTable.rowCount()):
@@ -121,9 +119,14 @@ class DataAttributeWidget(QWidget):
                 item.setChecked(True)
 
     def removeAttribute(self):
+        indexes = []
         for row in range(self.dataAttributeTable.rowCount()):
             item = self.dataAttributeTable.cellWidget(row,1)
             if(item.isChecked()):
                 index = int(self.dataAttributeTable.item(row,0).text())-1
-                self.dataModel.removeColumn(index)
-        self.parent().notifyModelChange(self.dataModel)
+                indexes.append(index)
+        if len(self.dataModel.getHeaders())==len(indexes):
+            self.parent().dialog_critical("Cannot remove all attributes from data !")
+        else:
+            self.dataModel.removeColumn(indexes)
+            self.parent().notifyModelChange(self.dataModel)

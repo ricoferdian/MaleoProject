@@ -12,32 +12,13 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-MainWindow
 Copyright (C) 2020 Henrico Aldy Ferdian & Lennia Savitri Azzahra Loviana
 Udayana University, Bali, Indonesia
-
-This part of python program consist of the visualization tab from main GUI application
 """
 
-import pandas as pd
-import csv
+# Inherit
+from maleo.lib.Module import Module
 
-class CSVLoader():
-    def __init__(self,path, *args):
-        self.path = path
-        self.data = None
-        self.header = None
-        self.loadData()
-
-    def loadData(self):
-        try:
-            self.data = pd.read_csv(self.path)
-            self.header = list(self.data.columns)
-        except Exception as e:
-            print("Error exception : ",e)
-
-    def getHeaders(self):
-        return self.header
-
-    def getData(self):
-        return self.data
+class CNN_NLP(Module):
+    def __init__(self, data, labels, *args):
+        super(CNN_NLP, self).__init__(data, labels)

@@ -25,7 +25,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 
 # Python Library
-import sys
+import os
 
 # Third Party Library
 
@@ -36,15 +36,19 @@ from maleo.src.gui.PreprocessingTab.CurrentRelationWidget import CurrentRelation
 from maleo.src.gui.PreprocessingTab.SelectAttributeWidget import SelectAttributeWidget
 
 # Data operation
+from maleo.src.model.DataModel import DataModel
 from maleo.src.utils.CSVLoader import CSVLoader
-from maleo.src.model.CSVDataModel import CSVDataModel
+from maleo.src.utils.JSONLoader import JSONLoader
+from maleo.src.utils.ExcelLoader import ExcelLoader
 
 class PreprocessingTab(QWidget):
     # Untuk return datamodel CSV
-    dataModelSignal = pyqtSignal(CSVDataModel)
+    dataModelSignal = pyqtSignal(DataModel)
 
     def __init__(self, parent, screenHeight, screenWidth):
         super(QWidget, self).__init__(parent)
+
+        self.dataModel = None
 
         self.layout = QVBoxLayout(self)
 
@@ -67,6 +71,7 @@ class PreprocessingTab(QWidget):
 
         self.layout.addWidget(self.fileOperationWidget, stretch=10)
         self.layout.addLayout(self.attributeLayout, stretch=90)
+
         self.setLayout(self.layout)
 
     def changeSelectedAttribute(self, items, data):
@@ -75,14 +80,50 @@ class PreprocessingTab(QWidget):
     def changeDataAttributeParent(self):
         return None
 
-    def loadDataModel(self, filename):
-        self.csvLoader = CSVLoader(filename)
-        self.data = self.csvLoader.getData()
+    def saveDataModel(self, filepath):
+        if self.dataModel is not None:
+            if filepath.lower().endswith('.csv'):
+                self.dataModel.toCSV(filepath)
+            elif filepath.lower().endswith('.json'):
+                self.dataModel.toJSON(filepath)
+            elif filepath.lower().endswith('.xls'):
+                self.dataModel.toExcel(filepath)
+            elif filepath.lower().endswith('.xlsx'):
+                self.dataModel.toExcel(filepath)
+            else:
+                self.dialog_critical("Unknown file extension to save !")
+        else:
+            self.dialog_critical("Cannot save nothing !")
 
-        self.dataModel = CSVDataModel(self.data)
+    def checkDataModel(self):
+        if self.dataModel is not None:
+            return True
+        else:
+            return False
 
-        self.updateDataAttributeModel(self.dataModel)
-        self.updateParentDataModel(self.dataModel)
+    def loadDataModel(self, filepath):
+        self.filename = os.path.splitext(os.path.basename(filepath))[0]
+
+        if filepath.lower().endswith('.csv'):
+            self.dataLoader = CSVLoader(filepath)
+        elif filepath.lower().endswith('.json'):
+            self.dataLoader = JSONLoader(filepath)
+        elif filepath.lower().endswith('.xls'):
+            self.dataLoader = ExcelLoader(filepath)
+        elif filepath.lower().endswith('.xlsx'):
+            self.dataLoader = ExcelLoader(filepath)
+        else:
+            return
+
+        self.data = self.dataLoader.getData()
+
+        if not self.data.empty:
+            self.dataModel = DataModel(self.data)
+
+            self.updateCurrentRelationWidget(self.data, self.filename)
+
+            self.updateDataAttributeModel(self.dataModel)
+            self.updateParentDataModel(self.dataModel)
 
     def notifyModelChange(self, dataModel):
         self.dataModel = dataModel
@@ -92,5 +133,14 @@ class PreprocessingTab(QWidget):
     def updateParentDataModel(self, dataModel):
         self.dataModelSignal.emit(dataModel)
 
+    def updateCurrentRelationWidget(self, data, filename):
+        self.currentRelationWidget.updateWidget(data, filename)
+
     def updateDataAttributeModel(self, dataModel):
         self.dataAttributeWidget.loadData(dataModel)
+
+    def dialog_critical(self, message):
+        dlg = QMessageBox(self)
+        dlg.setText(message)
+        dlg.setIcon(QMessageBox.Critical)
+        dlg.show()

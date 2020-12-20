@@ -19,25 +19,28 @@ Udayana University, Bali, Indonesia
 This part of python program consist of the visualization tab from main GUI application
 """
 
-import pandas as pd
-import csv
-
-class CSVLoader():
-    def __init__(self,path, *args):
-        self.path = path
-        self.data = None
-        self.header = None
-        self.loadData()
-
-    def loadData(self):
-        try:
-            self.data = pd.read_csv(self.path)
-            self.header = list(self.data.columns)
-        except Exception as e:
-            print("Error exception : ",e)
+class DataModel():
+    def __init__(self,data, *args):
+        self.data = data
 
     def getHeaders(self):
-        return self.header
+        return list(self.data.columns)
 
     def getData(self):
         return self.data
+
+    def describeData(self):
+        print(self.data.describe())
+
+    def toExcel(self, path, index=False):
+        self.data.to_excel(path, index=index)
+
+    def toCSV(self, path, index=False):
+        self.data.to_csv(path, index=index)
+
+    def toJSON(self, path, index=False):
+        self.data.to_json(path, index=index)
+
+    def removeColumn(self,indexes):
+        if len(self.data.columns):
+            self.data.drop(columns=[self.data.columns[index] for index in indexes], axis=1,inplace=True)

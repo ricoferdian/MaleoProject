@@ -19,10 +19,11 @@ Udayana University, Bali, Indonesia
 This part of python program consist of the visualization tab from main GUI application
 """
 
-import pandas as pd
-import csv
 
-class CSVLoader():
+import pandas as pd
+import json
+
+class ExcelLoader():
     def __init__(self,path, *args):
         self.path = path
         self.data = None
@@ -31,7 +32,7 @@ class CSVLoader():
 
     def loadData(self):
         try:
-            self.data = pd.read_csv(self.path)
+            self.data = pd.read_excel(self.path)
             self.header = list(self.data.columns)
         except Exception as e:
             print("Error exception : ",e)

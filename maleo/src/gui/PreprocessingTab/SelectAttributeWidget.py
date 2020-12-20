@@ -77,14 +77,15 @@ class SelectAttributeWidget(QWidget):
         self.setLayout(self.layout)
 
     def updateWidget(self, values, data):
-        self.selectedRowIndex = int(values[0].text())-1
-        self.selectedData = data.iloc[:, self.selectedRowIndex]
+        if len(values):
+            self.selectedRowIndex = int(values[0].text())-1
+            self.selectedData = data.iloc[:, self.selectedRowIndex]
 
-        self.dataTypeCheck.setDataType(self.selectedData)
-        self.dataType = self.dataTypeCheck.getDataType()
+            self.dataTypeCheck.setDataType(self.selectedData)
+            self.dataType = self.dataTypeCheck.getDataType()
 
-        self.changeLabel(self.selectedData)
-        self.changeTable(self.selectedData)
+            self.changeLabel(self.selectedData)
+            self.changeTable(self.selectedData)
 
     def changeLabel(self, data):
         self.dataShape = data.shape

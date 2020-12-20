@@ -12,11 +12,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-MainWindow
 Copyright (C) 2020 Henrico Aldy Ferdian & Lennia Savitri Azzahra Loviana
 Udayana University, Bali, Indonesia
-
-This part of python program consist of the visualization tab from main GUI application
 """
 
 import pandas as pd
@@ -24,9 +21,9 @@ from pandas.api.types import is_string_dtype
 from pandas.api.types import is_numeric_dtype
 from enum import Enum
 
-class PandasDatatypeCheck():
+class ModuleDataTypeParamCheck():
     def __init__(self, *args):
-        self.datatypes = Enum("DataType","Numeric Nominal Unknown")
+        self.datatypes = Enum("DataType", "NumericInput TextInput NumericSlider DropDown BooleanDropDown Unknown")
 
     def setDataType(self, value):
         self.value = value
@@ -35,9 +32,15 @@ class PandasDatatypeCheck():
         return self.datatypes
 
     def getDataType(self):
-        if is_numeric_dtype(self.value):
-            return self.datatypes.Numeric
-        elif is_string_dtype(self.value):
-            return self.datatypes.Nominal
+        if self.value == str(self.datatypes.NumericInput):
+            return self.datatypes.NumericInput
+        elif self.value == str(self.datatypes.TextInput):
+            return self.datatypes.TextInput
+        elif self.value == str(self.datatypes.NumericSlider):
+            return self.datatypes.NumericSlider
+        elif self.value == str(self.datatypes.DropDown):
+            return self.datatypes.DropDown
+        elif self.value == str(self.datatypes.BooleanDropDown):
+            return self.datatypes.BooleanDropDown
         else:
             return self.datatypes.Unknown

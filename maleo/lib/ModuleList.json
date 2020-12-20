@@ -1,0 +1,6 @@
+{
+  "Classification": {
+    "Bayesian":["NaiveBayes"],
+    "NeuralNetwork":["ANN","CNN","RNN"]
+  }
+}

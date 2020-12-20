@@ -58,3 +58,11 @@ class CurrentRelationWidget(QWidget):
 
         self.layout.addWidget(self.currentRelationGroup)
         self.setLayout(self.layout)
+
+    def updateWidget(self, data, filename):
+        self.dataShape = data.shape
+        if len(data):
+            self.relationLabel.setText("Relation : "+str(filename))
+            self.instancesLabel.setText("Instances : "+str(self.dataShape[0]))
+            self.attributesLabel.setText("Attributes : "+str(self.dataShape[1]))
+            self.sumWeightsLabel.setText("Sum Weights : "+str(self.dataShape[0]))
