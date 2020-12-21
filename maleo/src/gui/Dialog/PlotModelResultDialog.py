@@ -26,14 +26,8 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 
 # Python Library
-import sys
-import json
-import os.path as path
 
 # Third Party Library
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
-from matplotlib.figure import Figure
 import pyqtgraph as pg
 
 from random import random
@@ -41,27 +35,35 @@ from random import random
 class PlotModelResultDialog(QDialog):
     def __init__(self, parent):
         super(QDialog, self).__init__(parent)
-        layout = QGridLayout()
+        self.layout = QGridLayout()
 
         pg.setConfigOption('background', 'w')
         pg.setConfigOption('foreground', 'k')
 
-        # self.accFigure = Figure()
-        # self.lossFigure = Figure()
-        #
-        # self.accCanvas = FigureCanvas(self.accFigure)
-        # self.lossCanvas = FigureCanvas(self.lossFigure)
-        #
-        # layout.addWidget(self.accCanvas, 0, 0)
-        # layout.addWidget(self.lossCanvas, 0, 1)
+        self.accPlotWidget = pg.PlotWidget()
+        self.lossPlotWidget = pg.PlotWidget()
 
+        self.accPlotWidget.addLegend()
 
-        self.accPlot = pg.PlotWidget()
-        self.lossPlot = pg.PlotWidget()
+        self.trainAccPlot = self.accPlotWidget.plot([], [], pen=pg.mkPen('r', width=3), name="Training accuracy")
+        self.valAccPlot = self.accPlotWidget.plot([], [], pen=pg.mkPen('b', width=3), name="Training accuracy")
 
-        layout.addWidget(self.accPlot, 0, 0)
-        layout.addWidget(self.lossPlot, 0, 1)
-        self.setLayout(layout)
+        self.accPlotWidget.setTitle("Training and validation accuracy")
+        self.accPlotWidget.setLabel('left', 'Accuracy')
+        self.accPlotWidget.setLabel('bottom', 'Epochs')
+
+        self.lossPlotWidget.addLegend()
+
+        self.trainLossPlot = self.lossPlotWidget.plot([], [], pen=pg.mkPen('r', width=3), name="Training loss")
+        self.valLossPlot = self.lossPlotWidget.plot([], [], pen=pg.mkPen('b', width=3), name="Training loss")
+
+        self.lossPlotWidget.setTitle("Training and validation loss")
+        self.lossPlotWidget.setLabel('left', 'Loss')
+        self.lossPlotWidget.setLabel('bottom', 'Epochs')
+
+        self.layout.addWidget(self.accPlotWidget, 0, 0)
+        self.layout.addWidget(self.lossPlotWidget, 0, 1)
+        self.setLayout(self.layout)
 
     def setHistory(self, history):
         self.history = history
@@ -78,21 +80,13 @@ class PlotModelResultDialog(QDialog):
         self.plotLoss()
 
     def plotAcc(self):
-        self.accPlot.addLegend()
-        self.accPlot.plot(self.epochs, self.acc, pen=pg.mkPen('r', width=3), name="Training accuracy")
-        self.accPlot.plot(self.epochs, self.val_acc, pen=pg.mkPen('b', width=3), name="Training accuracy")
-        self.accPlot.setTitle("Training and validation accuracy")
-        self.accPlot.setLabel('left', 'Accuracy')
-        self.accPlot.setLabel('bottom', 'Epochs')
+        self.trainAccPlot.setData(self.epochs, self.acc)
+        self.valAccPlot.setData(self.epochs, self.val_acc)
 
     def show(self):
         super(QDialog, self).show()
         self.plot()
 
     def plotLoss(self):
-        self.lossPlot.addLegend()
-        self.lossPlot.plot(self.epochs, self.loss, pen=pg.mkPen('r', width=3), name="Training loss")
-        self.lossPlot.plot(self.epochs, self.val_loss, pen=pg.mkPen('b', width=3), name="Training loss")
-        self.lossPlot.setTitle("Training and validation accuracy")
-        self.lossPlot.setLabel('left', 'Loss')
-        self.lossPlot.setLabel('bottom', 'Epochs')
+        self.trainLossPlot.setData(self.epochs, self.loss)
+        self.valLossPlot.setData(self.epochs, self.val_loss)

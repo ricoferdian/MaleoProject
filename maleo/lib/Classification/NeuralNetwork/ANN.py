@@ -26,6 +26,7 @@ import tensorflow as tf
 # Inherit NN module
 from maleo.lib.Classification.NeuralNetwork.NeuralNetwork import NeuralNetwork
 
+# Biar nggak nyari GPU
 tf.config.set_visible_devices([],'GPU')
 
 class ANN(NeuralNetwork):

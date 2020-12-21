@@ -26,15 +26,71 @@ from PyQt5.QtCore import *
 
 # Python Library
 import sys
+import pyqtgraph as pg
 
 # Third Party Library
+import numpy as np
 
 class VisualizationTab(QWidget):
     def __init__(self, parent, screenHeight, screenWidth):
         super(QWidget, self).__init__(parent)
-        self.layout = QVBoxLayout(self)
+        self.layout = QGridLayout(self)
 
-        self.pushButton1 = QPushButton("PyQt5 button")
+        self.widthWidget = 4
 
-        self.layout.addWidget(self.pushButton1)
+        pg.setConfigOption('background', 'w')
+        pg.setConfigOption('foreground', 'k')
+
+        self.visualizationWidgets = []
+
         self.setLayout(self.layout)
+
+    def loadData(self, dataModel):
+        self.dataModel = dataModel
+        self.data = self.dataModel.getData()
+        if len(self.dataModel.getHeaders()):
+            try:
+                self.plot()
+            except Exception as e:
+                self.dialog_critical("Error exception "+str(e))
+        else:
+            self.dialog_critical("No data received !")
+
+    def plot(self):
+        for widget in self.visualizationWidgets:
+            self.layout.removeWidget(widget)
+            widget.deleteLater()
+            widget = None
+        self.visualizationWidgets = []
+
+        row = 0
+        col = 0
+        for column in self.data:
+            plot = pg.PlotWidget()
+
+            value = self.data[column].value_counts()
+            x = [i for i in value.keys()]
+            y = [j for i,j in value.items()]
+            if np.array(x).dtype.char == 'U':
+                x = [i for i in range(len(x))]
+
+            bar = pg.BarGraphItem(x=x, height=y, width=0.1, brush='b', pen=pg.mkPen('b', width=0.1))
+
+            plot.addItem(bar)
+            plot.setTitle(column)
+            # plot.setLabel('left', 'Value')
+            # plot.setLabel('bottom', 'Range')
+
+            self.visualizationWidgets.append(plot)
+            self.layout.addWidget(plot, row, col)
+
+            col += 1
+            if col == 4:
+                col = 0
+                row += 1
+
+    def dialog_critical(self, message):
+        dlg = QMessageBox(self)
+        dlg.setText(message)
+        dlg.setIcon(QMessageBox.Critical)
+        dlg.show()

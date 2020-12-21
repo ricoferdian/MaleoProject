@@ -47,17 +47,17 @@ class MainWindow(QMainWindow):
 
         self.tab1 = PreprocessingTab(self, screenHeight, screenWidth)
         self.tab2 = ClassificationTab(self, screenHeight, screenWidth)
-        self.tab3 = ClusteringTab(self, screenHeight, screenWidth)
-        self.tab4 = AssociationTab(self, screenHeight, screenWidth)
-        self.tab5 = AttributeTab(self, screenHeight, screenWidth)
+        # self.tab3 = ClusteringTab(self, screenHeight, screenWidth)
+        # self.tab4 = AssociationTab(self, screenHeight, screenWidth)
+        # self.tab5 = AttributeTab(self, screenHeight, screenWidth)
         self.tab6 = VisualizationTab(self, screenHeight, screenWidth)
 
         self.tabs.resize(500,200)
         self.tabs.addTab(self.tab1, "Preprocessing")
         self.tabs.addTab(self.tab2, "Klasifikasi")
-        self.tabs.addTab(self.tab3, "Clustering")
-        self.tabs.addTab(self.tab4, "Asosiasi")
-        self.tabs.addTab(self.tab5, "Pilih Atribut")
+        # self.tabs.addTab(self.tab3, "Clustering")
+        # self.tabs.addTab(self.tab4, "Asosiasi")
+        # self.tabs.addTab(self.tab5, "Pilih Atribut")
         self.tabs.addTab(self.tab6, "Visualisasi")
 
         self.tabs.setTabEnabled(1,False)
@@ -89,19 +89,19 @@ class MainWindow(QMainWindow):
         # self.updateClusteringDataModel(dataModel)
         # self.updateAssociationDataModel(dataModel)
         # self.updateAttributeDataModel(dataModel)
-        # self.updateVisualizationDataModel(dataModel)
+        self.updateVisualizationDataModel(dataModel)
 
     def updateClassificationDataModel(self, dataModel):
         self.tab2.loadData(dataModel)
 
-    def updateClusteringDataModel(self, dataModel):
-        self.tab3.loadData(dataModel)
-
-    def updateAssociationDataModel(self, dataModel):
-        self.tab4.loadData(dataModel)
-
-    def updateAttributeDataModel(self, dataModel):
-        self.tab5.loadData(dataModel)
+    # def updateClusteringDataModel(self, dataModel):
+    #     self.tab3.loadData(dataModel)
+    #
+    # def updateAssociationDataModel(self, dataModel):
+    #     self.tab4.loadData(dataModel)
+    #
+    # def updateAttributeDataModel(self, dataModel):
+    #     self.tab5.loadData(dataModel)
 
     def updateVisualizationDataModel(self, dataModel):
         self.tab6.loadData(dataModel)
