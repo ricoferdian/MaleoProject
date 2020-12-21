@@ -52,16 +52,16 @@ class FileOperationWidget(QWidget):
         self.setLayout(self.layout)
 
     def openFile(self):
-        # self.filePath = "D:\Libraries\Dataset\data huruf.csv"
-        # self.updateParentDataModel()
+        self.filePath = "D:\Libraries\Dataset\data huruf.csv"
+        self.updateParentDataModel()
 
-        path, _ = QFileDialog.getOpenFileName(self, "Open file", "", "Comma Separated Value (*.csv);"+
-                                              ";Javascript Object Notation (*.json);"+
-                                              ";Excel 2003-2007 Document (*.xls);"+
-                                              ";Excel Document (*.xlsx)")
-        if path:
-            self.filePath = path
-            self.updateParentDataModel()
+        # path, _ = QFileDialog.getOpenFileName(self, "Open file", "", "Comma Separated Value (*.csv);"+
+        #                                       ";Javascript Object Notation (*.json);"+
+        #                                       ";Excel 2003-2007 Document (*.xls);"+
+        #                                       ";Excel Document (*.xlsx)")
+        # if path:
+        #     self.filePath = path
+        #     self.updateParentDataModel()
 
     def saveFile(self):
         if self.parent().checkDataModel():

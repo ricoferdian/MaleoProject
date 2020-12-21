@@ -30,6 +30,9 @@ import sys
 
 # Third Party Library
 
+# GUI part Library
+from maleo.src.gui.Dialog.PlotModelResultDialog import PlotModelResultDialog
+
 class ResultListWidget(QWidget):
     def __init__(self, parent):
         super(QWidget, self).__init__(parent)
@@ -40,28 +43,69 @@ class ResultListWidget(QWidget):
         self.resultListGroup.setLayout(self.resultListLayout)
 
         self.classifierModel = []
+        self.plotModelResultDialog = PlotModelResultDialog(self)
 
         self.resultList = QListWidget()
         self.resultList.itemSelectionChanged.connect(self.resultChoiceChanged)
 
-        # self.showResultButton = QPushButton("Show Output")
-        # self.showResultButton.clicked.connect(self.showOutput)
+        self.resultButtonLayout = QHBoxLayout()
+        self.saveModelButton = QPushButton("Save Model")
+        # self.loadModelButton = QPushButton("Load Model")
+        self.resultButtonLayout.addWidget(self.saveModelButton)
+        # self.resultButtonLayout.addWidget(self.loadModelButton)
+
+        self.saveModelButton.clicked.connect(self.saveModel)
+        # self.loadModelButton.clicked.connect(self.loadModel)
+
+        self.plotModelResultButton = QPushButton("Plot Model Result")
+        self.plotModelResultButton.clicked.connect(self.plotModelResult)
 
         self.resultListLayout.addWidget(self.resultList)
-        # self.resultListLayout.addWidget(self.showResultButton)
+        self.resultListLayout.addLayout(self.resultButtonLayout)
+        self.resultListLayout.addWidget(self.plotModelResultButton)
 
         self.layout.addWidget(self.resultListGroup)
         self.setLayout(self.layout)
 
     def resultChoiceChanged(self):
         try:
-            selectedItem = self.resultList.selectedIndexes()[0]
-            self.parent().showClassifierOutput(selectedItem.row())
+            self.selectedItem = self.resultList.selectedIndexes()[0]
+            self.parent().showClassifierOutput(self.selectedItem.row())
         except Exception as e:
             self.parent().dialog_critical("No choice !"+str(e))
 
-    def showOutput(self):
-        print("Showing output")
+    def plotModelResult(self):
+        try:
+            if self.selectedItem.row() is not None:
+                model = self.classifierModel[self.selectedItem.row()]
+                self.plotModelResultDialog.setHistory(model.getHistory())
+                self.plotModelResultDialog.show()
+            else:
+                self.parent().dialog_critical("No model selected !")
+        except Exception as e:
+            self.parent().dialog_critical("No model result ! Error : "+str(e))
+
+    def saveModel(self):
+        try:
+            if self.selectedItem.row() is not None:
+                path, _ = QFileDialog.getSaveFileName(self, "Save file", "", "HDF 5 (*.h5)")
+
+                if not path:
+                    return
+                model = self.classifierModel[self.selectedItem.row()]
+                model.saveToPath(path)
+            else:
+                self.parent().dialog_critical("Cannot save nothing !")
+        except Exception as e:
+            self.parent().dialog_critical("No model result ! Error : "+str(e))
+
+    def loadModel(self):
+        try:
+            path, _ = QFileDialog.getOpenFileName(self, "Open file", "", "HDF 5 (*.h5);")
+            if path:
+                self.parent().loadModel(path)
+        except Exception as e:
+            self.parent().dialog_critical("No choice !"+str(e))
 
     def addClassifierResult(self, classifier):
         classifierName = classifier.getName()

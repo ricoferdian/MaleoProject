@@ -21,23 +21,45 @@ import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Inherit
+# Inherit main library module
 from maleo.lib.Module import Module
 
 class NeuralNetwork(Module):
     def __init__(self, data, labels, *args):
         super(NeuralNetwork, self).__init__(data, labels)
+        self.model = None
+        self.history = None
+        self.uniqueLabels = None
+        self.numEpochs = 100
+        self.batchSize = 128
 
-    def nominalToInteger(self, labels, uniqueLabels):
-        for index, data in enumerate(labels):
-            labels[index] = uniqueLabels.find(data)
-        return np.array(labels)
+    def nominalToInteger(self, labels):
+        if self.uniqueLabels:
+            for index, data in enumerate(labels):
+                labels[index] = self.uniqueLabels.find(data)
+            return np.array(labels)
 
-    def integerToNominal(self, labels, uniqueLabels):
-        print("Converting integer labels to integer labels")
-        for index, data in enumerate(labels):
-            labels[index] = uniqueLabels[data]
-        return np.array(labels)
+    def integerToNominal(self, labels):
+        if self.uniqueLabels:
+            for index, data in enumerate(labels):
+                labels[index] = self.uniqueLabels[data]
+            return np.array(labels)
+
+    def oneHotPredictionToLabel(self, arr_pred):
+        if self.uniqueLabels:
+            predictions = ['NONE' for i in arr_pred]
+            for index, alf_index in enumerate(arr_pred):
+                predictions[index] = self.uniqueLabels[int(alf_index)]
+            return predictions
+
+    def oneHostLabelToLabel(self, arr_onehot_alph):
+        if self.uniqueLabels:
+            realLabels = ['NONE' for i in arr_onehot_alph]
+            for index, subonehot_alph in enumerate(arr_onehot_alph):
+                for alf_index, onehot_alph in enumerate(subonehot_alph):
+                    if (onehot_alph == 1):
+                        realLabels[index] = self.uniqueLabels[int(alf_index)]
+            return realLabels
 
     def preprocessData(self):
         x = self.data.copy()
@@ -52,6 +74,13 @@ class NeuralNetwork(Module):
             sorted.sort()
             self.uniqueLabels = ''.join(str(v) for v in sorted)
 
-            y = self.nominalToInteger(y,self.uniqueLabels)
+            y = self.nominalToInteger(y)
 
         self.splitDataset(x, y, self.value)
+
+    def getHistory(self):
+        return self.history
+
+    def saveToPath(self, path):
+        if self.model:
+            self.model.save(path)

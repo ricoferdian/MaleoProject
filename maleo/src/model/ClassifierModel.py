@@ -26,8 +26,14 @@ class ClassifierModel():
     def getName(self):
         return self.classifier.getName()
 
+    def saveToPath(self, path):
+        self.classifier.saveToPath(path)
+
     def getModel(self):
         return self.classifier
+
+    def getHistory(self):
+        return self.classifier.getHistory()
 
     def start(self):
         self.classifier.startOperation()

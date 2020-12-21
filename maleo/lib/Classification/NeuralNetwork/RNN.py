@@ -16,9 +16,94 @@ Copyright (C) 2020 Henrico Aldy Ferdian & Lennia Savitri Azzahra Loviana
 Udayana University, Bali, Indonesia
 """
 
-# Inherit
-from maleo.lib.Module import Module
+# Python Library
+import multiprocessing
+import sys
 
-class RNN(Module):
+# Third Party Library
+import tensorflow as tf
+
+# Inherit
+from maleo.lib.Classification.NeuralNetwork.NeuralNetwork import NeuralNetwork
+
+class RNN(NeuralNetwork):
     def __init__(self, data, labels, *args):
         super(RNN, self).__init__(data, labels)
+        self.activationFunction = "relu"
+        self.name = "Recurrent Neural Network"
+
+    def getName(self):
+        return self.name
+
+    def getSupportedOperations(self):
+        return "DataType.Numeric", "DataType.Nominal"
+
+    def getUnsupportedOperations(self):
+        return None
+
+    def getAvailableSettings(self):
+        return {
+                "setActivationFunction":{
+                    "name":"Fungsi Aktivasi",
+                    "params":{
+                        "param1":{
+                                "type":"DataType.DropDown",
+                                "options":["sigmoid","relu"]
+                            }
+                        }
+                    }
+                }
+
+    def setActivationFunction(self, param1=None):
+        self.activationFunction = param1
+
+    def startOperation(self):
+        try:
+            self.proc = multiprocessing.Process(target=self.train(), args=())
+            self.proc.start()
+        except Exception as e:
+            print(e)
+
+    def stopOperation(self):
+        print("Recurrent Neural Network with Tensorflow stopped")
+        sys.stdout = self.originalStdOut
+        try:
+            self.proc.terminate()
+        except Exception as e:
+            print(e)
+
+    def setOutputWidget(self, output):
+        print("Output widget set",output)
+        self.outputWidget = output
+
+    def train(self):
+        self.originalStdOut = sys.stdout
+        sys.stdout = self.outputWidget
+
+        print("Recurrent Neural Network with Tensorflow")
+        print("Activation Function :",self.activationFunction)
+        print("Dataset :",self.data)
+        print("Labels :",self.labels)
+
+        out = self.labels.nunique()
+
+        self.preprocessData()
+
+        self.ltrain = tf.keras.utils.to_categorical(self.ltrain, out)
+        self.ltest = tf.keras.utils.to_categorical(self.ltest, out)
+
+        self.model = tf.keras.models.Sequential([
+            tf.keras.layers.Flatten(),
+            tf.keras.layers.Dense(out*2, activation='relu'),
+            tf.keras.layers.Dense(out)
+        ])
+
+        self.model.compile(loss=tf.keras.losses.CategoricalCrossentropy(from_logits=True),
+                      optimizer='adam',
+                      metrics=['acc'])
+
+        self.history = self.model.fit(x=self.dtrain,y=self.ltrain,epochs=self.numEpochs,batch_size=self.batchSize,validation_data=(self.dtest,self.ltest), verbose=1)
+
+
+        self.model.summary()
+        self.stopOperation()

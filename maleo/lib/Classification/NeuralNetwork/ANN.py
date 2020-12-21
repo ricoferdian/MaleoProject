@@ -23,7 +23,7 @@ import sys
 # Third Party Library
 import tensorflow as tf
 
-# Inherit
+# Inherit NN module
 from maleo.lib.Classification.NeuralNetwork.NeuralNetwork import NeuralNetwork
 
 tf.config.set_visible_devices([],'GPU')
@@ -31,7 +31,6 @@ tf.config.set_visible_devices([],'GPU')
 class ANN(NeuralNetwork):
     def __init__(self, data, labels, *args):
         super(ANN, self).__init__(data, labels)
-        self.isNominal = False
         self.activationFunction = "relu"
         self.name = "Artificial Neural Network"
 
@@ -47,11 +46,29 @@ class ANN(NeuralNetwork):
     def getAvailableSettings(self):
         return {
                 "setActivationFunction":{
-                    "name":"Fungsi Aktivasi",
+                    "name":"Fungsi Aktivasi Hidden Layer",
                     "params":{
                         "param1":{
                                 "type":"DataType.DropDown",
-                                "options":["sigmoid","relu"]
+                                "options":["relu","sigmoid","hard_sigmoid","elu","tanh","softplus","softmax"]
+                            }
+                        }
+                    },
+                "setNumEpochs":{
+                    "name":"Jumlah Epochs",
+                    "params":{
+                        "param1":{
+                                "type":"DataType.NumericInput",
+                                "default":100
+                            }
+                        }
+                    },
+                "setBatchSize":{
+                    "name":"Ukuran Batch",
+                    "params":{
+                        "param1":{
+                                "type":"DataType.NumericInput",
+                                "default":128
                             }
                         }
                     }
@@ -59,9 +76,18 @@ class ANN(NeuralNetwork):
 
     def setActivationFunction(self, param1=None):
         self.activationFunction = param1
-        print("data",self.data)
-        print("labels",self.labels)
-        print("self.activationFunction :",self.activationFunction)
+
+    def setNumEpochs(self, param1=None):
+        try:
+            self.numEpochs = int(param1)
+        except Exception as e:
+            print(e)
+
+    def setBatchSize(self, param1=None):
+        try:
+            self.batchSize = int(param1)
+        except Exception as e:
+            print(e)
 
     def startOperation(self):
         try:
@@ -79,7 +105,6 @@ class ANN(NeuralNetwork):
             print(e)
 
     def setOutputWidget(self, output):
-        print("Output widget set",output)
         self.outputWidget = output
 
     def train(self):
@@ -88,6 +113,9 @@ class ANN(NeuralNetwork):
 
         print("Artificial Neural Network with Tensorflow")
         print("Activation Function :",self.activationFunction)
+        print("Num of Epochs :",self.numEpochs)
+        print("Batch Size :",self.batchSize)
+
         print("Dataset :",self.data)
         print("Labels :",self.labels)
 
@@ -100,7 +128,7 @@ class ANN(NeuralNetwork):
 
         self.model = tf.keras.models.Sequential([
             tf.keras.layers.Flatten(),
-            tf.keras.layers.Dense(out*2, activation='relu'),
+            tf.keras.layers.Dense(out*2, activation=self.activationFunction),
             tf.keras.layers.Dense(out)
         ])
 
@@ -108,8 +136,7 @@ class ANN(NeuralNetwork):
                       optimizer='adam',
                       metrics=['acc'])
 
-        self.history = self.model.fit(x=self.dtrain,y=self.ltrain,epochs=100,batch_size=128,validation_data=(self.dtest,self.ltest), verbose=1)
+        self.history = self.model.fit(x=self.dtrain,y=self.ltrain,epochs=self.numEpochs,batch_size=self.batchSize,validation_data=(self.dtest,self.ltest), verbose=1)
 
         self.model.summary()
-
         self.stopOperation()
