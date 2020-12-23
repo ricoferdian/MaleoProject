@@ -20,24 +20,17 @@ This part of python program consist of the visualization tab from main GUI appli
 """
 
 import pandas as pd
-import csv
 
 class CSVLoader():
     def __init__(self,path, *args):
         self.path = path
-        self.data = None
-        self.header = None
         self.loadData()
 
     def loadData(self):
         try:
             self.data = pd.read_csv(self.path)
-            self.header = list(self.data.columns)
         except Exception as e:
             print("Error exception : ",e)
-
-    def getHeaders(self):
-        return self.header
 
     def getData(self):
         return self.data

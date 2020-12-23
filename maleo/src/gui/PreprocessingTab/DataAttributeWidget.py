@@ -36,11 +36,11 @@ import csv
 from maleo.src.utils.TableView import TableView
 
 class DataAttributeWidget(QWidget):
-    def __init__(self, parent):
+    def __init__(self, parent, dataModel):
         super(QWidget, self).__init__(parent)
-        self.layout = QHBoxLayout(self)
+        self.dataModel = dataModel
 
-        # self.selectAttributeWidget = SelectAttributeWidget(self)
+        self.layout = QHBoxLayout(self)
 
         self.dataAttributeGroup = QGroupBox("Attributes")
         self.dataAttributeLayout = QVBoxLayout()
@@ -78,14 +78,13 @@ class DataAttributeWidget(QWidget):
 
     def changeSelectedAttributeParent(self):
         items = self.dataAttributeTable.selectedItems()
-        self.parent().changeSelectedAttribute(items, self.data)
+        self.parent().changeSelectedAttribute(items)
 
-    def loadData(self, dataModel):
-        self.dataModel = dataModel
+    def loadData(self):
         self.data = self.dataModel.getData()
-        self.header = self.dataModel.getHeaders()
+        self.header = list(self.data.columns)
+
         if(len(self.header)):
-            # Transform
             self.header = {"Name":{i:self.header[i] for i in range(len(self.header))}}
             first_key = next(iter(self.header.keys()))
             self.header[" No"] = {i:i+1 for i in range(len(self.header[first_key]))}
@@ -94,7 +93,6 @@ class DataAttributeWidget(QWidget):
             self.drawTable(self.header, len(self.header[first_key]), len(self.header))
         else:
             self.drawTable({}, 0 ,0)
-
 
     def drawTable(self,data,row, col):
         self.dataAttributeTable.updateParameter(col,row)
@@ -129,4 +127,3 @@ class DataAttributeWidget(QWidget):
             self.parent().dialog_critical("Cannot remove all attributes from data !")
         else:
             self.dataModel.removeColumn(indexes)
-            self.parent().notifyModelChange(self.dataModel)

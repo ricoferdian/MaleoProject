@@ -30,11 +30,11 @@ import sys
 # Third Party Library
 
 class ClusteringTab(QWidget):
-    def __init__(self, parent, screenHeight, screenWidth):
+    def __init__(self, parent, dataModel, screenHeight, screenWidth):
         super(QWidget, self).__init__(parent)
         self.layout = QVBoxLayout(self)
 
-        self.pushButton1 = QPushButton("PyQt5 button")
+        self.pushButton1 = QPushButton("Coming Soon !")
 
         self.layout.addWidget(self.pushButton1)
         self.setLayout(self.layout)

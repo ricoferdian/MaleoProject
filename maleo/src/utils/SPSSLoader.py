@@ -19,38 +19,18 @@ Udayana University, Bali, Indonesia
 This part of python program consist of the visualization tab from main GUI application
 """
 
-class DataModel():
-    def __init__(self,data, *args):
-        self.data = data
-        self.relation = "None"
+import pandas as pd
 
-    def setData(self, data):
-        self.data = data
+class SPSSLoader():
+    def __init__(self,path, *args):
+        self.path = path
+        self.loadData()
 
-    def getShape(self):
-        return self.data.shape
-
-    def setRelation(self, relation):
-        self.relation = relation
-
-    def getRelation(self):
-        return self.relation
-
-    def isEmpty(self):
-        return self.data.empty
+    def loadData(self):
+        try:
+            self.data = pd.read_spss(self.path)
+        except Exception as e:
+            print("Error exception : ",e)
 
     def getData(self):
         return self.data
-
-    def toExcel(self, path, index=False):
-        self.data.to_excel(path, index=index)
-
-    def toCSV(self, path, index=False):
-        self.data.to_csv(path, index=index)
-
-    def toJSON(self, path, index=False):
-        self.data.to_json(path, index=index)
-
-    def removeColumn(self,indexes):
-        if len(self.data.columns):
-            self.data.drop(columns=[self.data.columns[index] for index in indexes], axis=1,inplace=True)

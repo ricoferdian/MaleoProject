@@ -31,8 +31,10 @@ import sys
 # Third Party Library
 
 class CurrentRelationWidget(QWidget):
-    def __init__(self, parent):
+    def __init__(self, parent, dataModel):
         super(QWidget, self).__init__(parent)
+        self.dataModel = dataModel
+
         self.layout = QHBoxLayout(self)
 
         self.currentRelationGroup = QGroupBox("Current Relation")
@@ -59,10 +61,10 @@ class CurrentRelationWidget(QWidget):
         self.layout.addWidget(self.currentRelationGroup)
         self.setLayout(self.layout)
 
-    def updateWidget(self, data, filename):
-        self.dataShape = data.shape
-        if len(data):
-            self.relationLabel.setText("Relation : "+str(filename))
+    def loadData(self):
+        self.dataShape = self.dataModel.getShape()
+        if not self.dataModel.isEmpty():
+            self.relationLabel.setText("Relation : "+str(self.dataModel.getRelation()))
             self.instancesLabel.setText("Instances : "+str(self.dataShape[0]))
             self.attributesLabel.setText("Attributes : "+str(self.dataShape[1]))
             self.sumWeightsLabel.setText("Sum Weights : "+str(self.dataShape[0]))

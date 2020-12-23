@@ -37,6 +37,9 @@ from maleo.src.gui.AttributeTab.AttributeTab import AttributeTab
 from maleo.src.gui.AssociationTab.AssociationTab import AssociationTab
 from maleo.src.gui.ClassificationTab.ClassificationTab import ClassificationTab
 
+# Data model accross project
+from maleo.src.model.DataModel import DataModel
+
 class MainWindow(QMainWindow):
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
@@ -44,18 +47,20 @@ class MainWindow(QMainWindow):
         global screenHeight
 
         self.tabs = QTabWidget()
+        
+        self.dataModel = DataModel([])
 
-        self.tab1 = PreprocessingTab(self, screenHeight, screenWidth)
-        self.tab2 = ClassificationTab(self, screenHeight, screenWidth)
-        # self.tab3 = ClusteringTab(self, screenHeight, screenWidth)
-        # self.tab4 = AssociationTab(self, screenHeight, screenWidth)
-        # self.tab5 = AttributeTab(self, screenHeight, screenWidth)
-        self.tab6 = VisualizationTab(self, screenHeight, screenWidth)
+        self.tab1 = PreprocessingTab(self, self.dataModel, screenHeight, screenWidth)
+        self.tab2 = ClassificationTab(self, self.dataModel, screenHeight, screenWidth)
+        self.tab3 = ClusteringTab(self, self.dataModel, screenHeight, screenWidth)
+        # self.tab4 = AssociationTab(self, self.dataModel, screenHeight, screenWidth)
+        # self.tab5 = AttributeTab(self, self.dataModel, screenHeight, screenWidth)
+        self.tab6 = VisualizationTab(self, self.dataModel, screenHeight, screenWidth)
 
         self.tabs.resize(500,200)
         self.tabs.addTab(self.tab1, "Preprocessing")
         self.tabs.addTab(self.tab2, "Klasifikasi")
-        # self.tabs.addTab(self.tab3, "Clustering")
+        self.tabs.addTab(self.tab3, "Clustering")
         # self.tabs.addTab(self.tab4, "Asosiasi")
         # self.tabs.addTab(self.tab5, "Pilih Atribut")
         self.tabs.addTab(self.tab6, "Visualisasi")
@@ -66,45 +71,39 @@ class MainWindow(QMainWindow):
         self.tabs.setTabEnabled(4,False)
         self.tabs.setTabEnabled(5,False)
 
-        self.tab1.dataModelSignal.connect(self.updateDataModel)
+        self.tab1.dataLoadedSignal.connect(self.dataLoaded)
 
         self.setCentralWidget(self.tabs)
         self.show()
 
-    def updateDataModel(self, dataModel):
-        self.dataModel = dataModel
-        self.data = self.dataModel.getData()
-        self.header = self.dataModel.getHeaders()
-
+    def dataLoaded(self):
         self.tabs.setTabEnabled(1,True)
         self.tabs.setTabEnabled(2,True)
         self.tabs.setTabEnabled(3,True)
         self.tabs.setTabEnabled(4,True)
         self.tabs.setTabEnabled(5,True)
-
         self.updateChildDataModel(self.dataModel)
 
-    def updateChildDataModel(self, dataModel):
-        self.updateClassificationDataModel(dataModel)
-        # self.updateClusteringDataModel(dataModel)
-        # self.updateAssociationDataModel(dataModel)
-        # self.updateAttributeDataModel(dataModel)
-        self.updateVisualizationDataModel(dataModel)
+        self.loadClassificationData()
+        # self.updateClusteringDataModel()
+        # self.updateAssociationDataModel()
+        # self.updateAttributeDataModel()
+        self.updateVisualizationDataModel()
 
-    def updateClassificationDataModel(self, dataModel):
-        self.tab2.loadData(dataModel)
+    def loadClassificationData(self):
+        self.tab2.loadData()
 
-    # def updateClusteringDataModel(self, dataModel):
-    #     self.tab3.loadData(dataModel)
+    # def loadClusteringDataModel(self):
+    #     self.tab3.loadData()
     #
-    # def updateAssociationDataModel(self, dataModel):
-    #     self.tab4.loadData(dataModel)
+    # def loadAssociationDataModel(self):
+    #     self.tab4.loadData()
     #
-    # def updateAttributeDataModel(self, dataModel):
-    #     self.tab5.loadData(dataModel)
+    # def loadAttributeDataModel(self):
+    #     self.tab5.loadData()
 
-    def updateVisualizationDataModel(self, dataModel):
-        self.tab6.loadData(dataModel)
+    def loadVisualizationDataModel(self):
+        self.tab6.loadData()
 
 def runMainWindow():
     global screenWidth

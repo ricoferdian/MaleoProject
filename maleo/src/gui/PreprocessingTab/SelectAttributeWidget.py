@@ -34,8 +34,10 @@ from maleo.src.utils.PandasDatatypeCheck import *
 from maleo.src.utils.TableView import TableView
 
 class SelectAttributeWidget(QWidget):
-    def __init__(self, parent):
+    def __init__(self, parent, dataModel):
         super(QWidget, self).__init__(parent)
+        self.dataModel = dataModel
+
         self.layout = QHBoxLayout(self)
         self.dataTypeCheck = PandasDatatypeCheck()
 
@@ -76,10 +78,13 @@ class SelectAttributeWidget(QWidget):
         self.layout.addWidget(self.selectedAttributeGroup)
         self.setLayout(self.layout)
 
-    def updateWidget(self, values, data):
+    def loadData(self):
+        self.data = self.dataModel.getData()
+
+    def updateWidget(self, values):
         if len(values):
             self.selectedRowIndex = int(values[0].text())-1
-            self.selectedData = data.iloc[:, self.selectedRowIndex]
+            self.selectedData = self.data.iloc[:, self.selectedRowIndex]
 
             self.dataTypeCheck.setDataType(self.selectedData)
             self.dataType = self.dataTypeCheck.getDataType()

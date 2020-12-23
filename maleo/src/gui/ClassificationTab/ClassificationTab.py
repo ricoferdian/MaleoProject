@@ -40,10 +40,12 @@ from maleo.src.utils.PandasDatatypeCheck import PandasDatatypeCheck
 from maleo.src.model.ClassifierModel import ClassifierModel
 
 class ClassificationTab(QWidget):
-    def __init__(self, parent, screenHeight, screenWidth):
+    def __init__(self, parent, dataModel, screenHeight, screenWidth):
         super(QWidget, self).__init__(parent)
-        self.layout = QVBoxLayout(self)
+        self.dataModel = dataModel
         self.module = None
+
+        self.layout = QVBoxLayout(self)
 
         self.classifierWidget = ClassifierWidget(self)
         self.dataTypeCheck = PandasDatatypeCheck()
@@ -69,14 +71,13 @@ class ClassificationTab(QWidget):
         self.layout.addLayout(self.testLayout, stretch=90)
         self.setLayout(self.layout)
 
-    def loadData(self, dataModel):
-        self.dataModel = dataModel
+    def loadData(self):
         self.data = self.dataModel.getData()
-        self.header = self.dataModel.getHeaders()
 
         self.attributes = self.data.iloc[:,:-1]
         self.labels = self.data.iloc[:,-1:]
-        if len(self.header):
+
+        if not self.dataModel.isEmpty():
             self.moduleOperationWidget.setLabelDropDown(self.dataModel)
             self.setClassifierData(self.attributes, self.labels)
         else:

@@ -35,35 +35,25 @@ from maleo.src.gui.PreprocessingTab.DataAttributeWidget import DataAttributeWidg
 from maleo.src.gui.PreprocessingTab.CurrentRelationWidget import CurrentRelationWidget
 from maleo.src.gui.PreprocessingTab.SelectAttributeWidget import SelectAttributeWidget
 
-# Data operation
-from maleo.src.model.DataModel import DataModel
-from maleo.src.utils.CSVLoader import CSVLoader
-from maleo.src.utils.JSONLoader import JSONLoader
-from maleo.src.utils.ExcelLoader import ExcelLoader
-
 class PreprocessingTab(QWidget):
-    # Untuk return datamodel CSV
-    dataModelSignal = pyqtSignal(DataModel)
-
-    def __init__(self, parent, screenHeight, screenWidth):
+    dataLoadedSignal = pyqtSignal()
+    def __init__(self, parent, dataModel, screenHeight, screenWidth):
         super(QWidget, self).__init__(parent)
-
-        self.dataModel = None
+        self.dataModel = dataModel
 
         self.layout = QVBoxLayout(self)
 
-        self.fileOperationWidget = FileOperationWidget(self)
-
+        self.fileOperationWidget = FileOperationWidget(self, self.dataModel)
         self.attributeLayout = QHBoxLayout()
-
         self.leftAttributeLayout = QVBoxLayout()
-        self.currentRelationWidget = CurrentRelationWidget(self)
-        self.dataAttributeWidget = DataAttributeWidget(self)
+
+        self.currentRelationWidget = CurrentRelationWidget(self, self.dataModel)
+        self.dataAttributeWidget = DataAttributeWidget(self, self.dataModel)
         self.leftAttributeLayout.addWidget(self.currentRelationWidget)
         self.leftAttributeLayout.addWidget(self.dataAttributeWidget)
 
         self.rightAttributeLayout = QVBoxLayout()
-        self.selectAttributeWidget = SelectAttributeWidget(self)
+        self.selectAttributeWidget = SelectAttributeWidget(self, self.dataModel)
         self.rightAttributeLayout.addWidget(self.selectAttributeWidget)
 
         self.attributeLayout.addLayout(self.leftAttributeLayout, stretch=50)
@@ -74,70 +64,14 @@ class PreprocessingTab(QWidget):
 
         self.setLayout(self.layout)
 
-    def changeSelectedAttribute(self, items, data):
-        self.selectAttributeWidget.updateWidget(items, data)
+    def dataLoaded(self):
+        self.dataLoadedSignal.emit()
+        self.currentRelationWidget.loadData()
+        self.dataAttributeWidget.loadData()
+        self.selectAttributeWidget.loadData()
 
-    def changeDataAttributeParent(self):
-        return None
-
-    def saveDataModel(self, filepath):
-        if self.dataModel is not None:
-            if filepath.lower().endswith('.csv'):
-                self.dataModel.toCSV(filepath)
-            elif filepath.lower().endswith('.json'):
-                self.dataModel.toJSON(filepath)
-            elif filepath.lower().endswith('.xls'):
-                self.dataModel.toExcel(filepath)
-            elif filepath.lower().endswith('.xlsx'):
-                self.dataModel.toExcel(filepath)
-            else:
-                self.dialog_critical("Unknown file extension to save !")
-        else:
-            self.dialog_critical("Cannot save nothing !")
-
-    def checkDataModel(self):
-        if self.dataModel is not None:
-            return True
-        else:
-            return False
-
-    def loadDataModel(self, filepath):
-        self.filename = os.path.splitext(os.path.basename(filepath))[0]
-
-        if filepath.lower().endswith('.csv'):
-            self.dataLoader = CSVLoader(filepath)
-        elif filepath.lower().endswith('.json'):
-            self.dataLoader = JSONLoader(filepath)
-        elif filepath.lower().endswith('.xls'):
-            self.dataLoader = ExcelLoader(filepath)
-        elif filepath.lower().endswith('.xlsx'):
-            self.dataLoader = ExcelLoader(filepath)
-        else:
-            return
-
-        self.data = self.dataLoader.getData()
-
-        if not self.data.empty:
-            self.dataModel = DataModel(self.data)
-
-            self.updateCurrentRelationWidget(self.data, self.filename)
-
-            self.updateDataAttributeModel(self.dataModel)
-            self.updateParentDataModel(self.dataModel)
-
-    def notifyModelChange(self, dataModel):
-        self.dataModel = dataModel
-        self.updateDataAttributeModel(self.dataModel)
-        self.updateParentDataModel(self.dataModel)
-
-    def updateParentDataModel(self, dataModel):
-        self.dataModelSignal.emit(dataModel)
-
-    def updateCurrentRelationWidget(self, data, filename):
-        self.currentRelationWidget.updateWidget(data, filename)
-
-    def updateDataAttributeModel(self, dataModel):
-        self.dataAttributeWidget.loadData(dataModel)
+    def changeSelectedAttribute(self, items):
+        self.selectAttributeWidget.updateWidget(items)
 
     def dialog_critical(self, message):
         dlg = QMessageBox(self)

@@ -26,13 +26,24 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 
 # Python Library
-import sys
+import os
 
 # Third Party Library
 
+# Data operation
+from maleo.src.utils.CSVLoader import CSVLoader
+from maleo.src.utils.JSONLoader import JSONLoader
+from maleo.src.utils.ExcelLoader import ExcelLoader
+from maleo.src.utils.SPSSLoader import SPSSLoader
+from maleo.src.utils.SASLoader import SASLoader
+from maleo.src.utils.PickleLoader import PickleLoader
+from maleo.src.utils.StataLoader import StataLoader
+
 class FileOperationWidget(QWidget):
-    def __init__(self, parent):
+    def __init__(self, parent, dataModel):
         super(QWidget, self).__init__(parent)
+        self.dataModel = dataModel
+
         self.layout = QHBoxLayout(self)
 
         self.fileOperationGroup = QGroupBox("File Operation")
@@ -52,29 +63,81 @@ class FileOperationWidget(QWidget):
         self.setLayout(self.layout)
 
     def openFile(self):
-        # self.filePath = "D:\Libraries\Dataset\data huruf.csv"
-        # self.updateParentDataModel()
-
         path, _ = QFileDialog.getOpenFileName(self, "Open file", "", "Comma Separated Value (*.csv);"+
                                               ";Javascript Object Notation (*.json);"+
                                               ";Excel 2003-2007 Document (*.xls);"+
-                                              ";Excel Document (*.xlsx)")
+                                              ";Excel Document (*.xlsx);"+
+                                              ";SPSS File (*.sav);"+
+                                              ";SAS File (*.sas);"+
+                                              ";SAS v7 File (*.sas7bpgm);"+
+                                              ";Stata File (*.dta);"+
+                                              ";Python Pickle File (*.P);"+
+                                              ";Python Pickle File (*.pickle)")
         if path:
             self.filePath = path
-            self.updateParentDataModel()
+            self.loadDataModel()
 
     def saveFile(self):
-        if self.parent().checkDataModel():
+        if not self.dataModel.isEmpty():
             path, _ = QFileDialog.getSaveFileName(self, "Save file", "", "Comma Separated Value (*.csv);"+
                                                   ";Javascript Object Notation (*.json);"+
                                                   ";Excel 2003-2007 Document (*.xls);"+
-                                                  ";Excel Document (*.xlsx)")
+                                                  ";Excel Document (*.xlsx);"+
+                                                  ";SPSS File (*.sav);"+
+                                                  ";SAS File (*.sas);"+
+                                                  ";SAS v7 File (*.sas7bpgm);"+
+                                                  ";Stata File (*.dta);"+
+                                                  ";Python Pickle File (*.P);"+
+                                                  ";Python Pickle File (*.pickle)")
 
             if not path:
-                return
-            self.parent().saveDataModel(path)
+                self.filePath = path
+                self.saveDataModel()
         else:
             self.parent().dialog_critical("Cannot save nothing !")
 
-    def updateParentDataModel(self):
-        self.parent().loadDataModel(self.filePath)
+    def loadDataModel(self):
+        self.filename = os.path.splitext(os.path.basename(self.filePath))[0]
+
+        if self.filePath.lower().endswith('.csv'):
+            self.dataLoader = CSVLoader(self.filePath)
+        elif self.filePath.lower().endswith('.json'):
+            self.dataLoader = JSONLoader(self.filePath)
+        elif self.filePath.lower().endswith('.xls'):
+            self.dataLoader = ExcelLoader(self.filePath)
+        elif self.filePath.lower().endswith('.xlsx'):
+            self.dataLoader = ExcelLoader(self.filePath)
+        elif self.filePath.lower().endswith('.xlsx'):
+            self.dataLoader = ExcelLoader(self.filePath)
+        elif self.filePath.lower().endswith('.sas'):
+            self.dataLoader = SASLoader(self.filePath)
+        elif self.filePath.lower().endswith('.sas7bpgm'):
+            self.dataLoader = SASLoader(self.filePath)
+        elif self.filePath.lower().endswith('.sav'):
+            self.dataLoader = SPSSLoader(self.filePath)
+        elif self.filePath.lower().endswith('.dta'):
+            self.dataLoader = StataLoader(self.filePath)
+        elif self.filePath.lower().endswith('.P'):
+            self.dataLoader = PickleLoader(self.filePath)
+        elif self.filePath.lower().endswith('.pickle'):
+            self.dataLoader = PickleLoader(self.filePath)
+        else:
+            self.dialog_critical("Unknown file extension to load !")
+            return
+
+        self.dataLoader.loadData()
+        self.dataModel.setData(self.dataLoader.getData())
+        print("data",self.dataModel.getData())
+        self.parent().dataLoaded()
+
+    def saveDataModel(self):
+        if self.filePath.lower().endswith('.csv'):
+            self.dataModel.toCSV(self.filePath)
+        elif self.filePath.lower().endswith('.json'):
+            self.dataModel.toJSON(self.filePath)
+        elif self.filePath.lower().endswith('.xls'):
+            self.dataModel.toExcel(self.filePath)
+        elif self.filePath.lower().endswith('.xlsx'):
+            self.dataModel.toExcel(self.filePath)
+        else:
+            self.parent().dialog_critical("Unknown file extension to save !")

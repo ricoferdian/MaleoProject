@@ -1,5 +1,5 @@
 {
   "Classification": {
-    "NeuralNetwork":["ANN","CNN","RNN","CNN_NLP","RNN_NLP"]
+    "NeuralNetwork":["ANN","RNN_NLP"]
   }
 }
