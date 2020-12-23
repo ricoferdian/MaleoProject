@@ -82,13 +82,12 @@ class MainWindow(QMainWindow):
         self.tabs.setTabEnabled(3,True)
         self.tabs.setTabEnabled(4,True)
         self.tabs.setTabEnabled(5,True)
-        self.updateChildDataModel(self.dataModel)
 
         self.loadClassificationData()
-        # self.updateClusteringDataModel()
-        # self.updateAssociationDataModel()
-        # self.updateAttributeDataModel()
-        self.updateVisualizationDataModel()
+        # self.loadClusteringDataModel()
+        # self.loadAssociationDataModel()
+        # self.loadAttributeDataModel()
+        self.loadVisualizationDataModel()
 
     def loadClassificationData(self):
         self.tab2.loadData()

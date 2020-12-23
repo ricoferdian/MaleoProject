@@ -54,7 +54,7 @@ class ClassificationTab(QWidget):
 
         self.leftTestLayout = QVBoxLayout()
         self.testOptionWidget = TestOptionWidget(self)
-        self.moduleOperationWidget = ModuleOperationWidget(self)
+        self.moduleOperationWidget = ModuleOperationWidget(self, self.dataModel)
         self.resultListWidget = ResultListWidget(self)
         self.leftTestLayout.addWidget(self.testOptionWidget,stretch=40)
         self.leftTestLayout.addWidget(self.moduleOperationWidget, stretch=20)
@@ -78,7 +78,7 @@ class ClassificationTab(QWidget):
         self.labels = self.data.iloc[:,-1:]
 
         if not self.dataModel.isEmpty():
-            self.moduleOperationWidget.setLabelDropDown(self.dataModel)
+            self.moduleOperationWidget.setLabelDropDown()
             self.setClassifierData(self.attributes, self.labels)
         else:
             self.dialog_critical("No data received !")

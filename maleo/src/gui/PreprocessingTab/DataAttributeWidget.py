@@ -123,7 +123,8 @@ class DataAttributeWidget(QWidget):
             if(item.isChecked()):
                 index = int(self.dataAttributeTable.item(row,0).text())-1
                 indexes.append(index)
-        if len(self.dataModel.getHeaders())==len(indexes):
+        if len(list(self.data.columns))==len(indexes):
             self.parent().dialog_critical("Cannot remove all attributes from data !")
         else:
             self.dataModel.removeColumn(indexes)
+            self.parent().dataLoaded()

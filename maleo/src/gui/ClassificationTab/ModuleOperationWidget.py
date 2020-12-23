@@ -33,8 +33,9 @@ import sys
 from maleo.src.utils.PandasDatatypeCheck import PandasDatatypeCheck
 
 class ModuleOperationWidget(QWidget):
-    def __init__(self, parent):
+    def __init__(self, parent, dataModel):
         super(QWidget, self).__init__(parent)
+        self.dataModel = dataModel
         self.layout = QHBoxLayout(self)
         self.supported = []
         self.unsupported = []
@@ -92,13 +93,13 @@ class ModuleOperationWidget(QWidget):
                 self.startOperationButton.setEnabled(True)
                 self.parent().setLabel(i)
 
-    def setLabelDropDown(self, dataModel):
-        data = dataModel.getData()
+    def setLabelDropDown(self):
+        self.data = self.dataModel.getData()
         self.selectLabelDropDown.clear()
-        self.headers = dataModel.getHeaders()
+        self.headers = list(self.data.columns)
         self.headerIndex = {}
         for index in range(len(self.headers)):
-            selectedData = data.iloc[:, index]
+            selectedData = self.data.iloc[:, index]
             self.dataTypeCheck.setDataType(selectedData)
             dataType = self.dataTypeCheck.getDataType()
 

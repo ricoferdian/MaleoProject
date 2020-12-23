@@ -34,6 +34,8 @@ import numpy as np
 class VisualizationTab(QWidget):
     def __init__(self, parent, dataModel, screenHeight, screenWidth):
         super(QWidget, self).__init__(parent)
+        self.dataModel = dataModel
+
         self.layout = QGridLayout(self)
 
         self.widthWidget = 4
@@ -45,10 +47,9 @@ class VisualizationTab(QWidget):
 
         self.setLayout(self.layout)
 
-    def loadData(self, dataModel):
-        self.dataModel = dataModel
+    def loadData(self):
         self.data = self.dataModel.getData()
-        if len(self.dataModel.getHeaders()):
+        if not self.dataModel.isEmpty():
             try:
                 self.plot()
             except Exception as e:
