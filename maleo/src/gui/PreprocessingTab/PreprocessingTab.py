@@ -64,6 +64,11 @@ class PreprocessingTab(QWidget):
 
         self.setLayout(self.layout)
 
+    def loadData(self):
+        self.currentRelationWidget.loadData()
+        self.dataAttributeWidget.loadData()
+        self.selectAttributeWidget.loadData()
+
     def dataLoaded(self):
         self.dataLoadedSignal.emit()
         self.currentRelationWidget.loadData()

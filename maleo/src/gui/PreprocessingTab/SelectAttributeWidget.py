@@ -21,17 +21,14 @@ in preprocessing tab from main GUI application
 """
 
 # PyQt5 GUI Library
-from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
 
 # Python Library
-import sys
 
 # Third Party Library
 
-from maleo.src.utils.PandasDatatypeCheck import *
-from maleo.src.utils.TableView import TableView
+from maleo.src.utils.DatasetLoader.PandasDatatypeCheck import *
+from maleo.src.utils.DatasetLoader.TableView import TableView
 
 class SelectAttributeWidget(QWidget):
     def __init__(self, parent, dataModel):

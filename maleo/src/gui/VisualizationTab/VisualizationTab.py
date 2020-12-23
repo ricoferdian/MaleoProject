@@ -32,7 +32,7 @@ import pyqtgraph as pg
 import numpy as np
 
 class VisualizationTab(QWidget):
-    def __init__(self, parent, dataModel, screenHeight, screenWidth):
+    def __init__(self, parent, dataModel, modelResults, screenHeight, screenWidth):
         super(QWidget, self).__init__(parent)
         self.dataModel = dataModel
 

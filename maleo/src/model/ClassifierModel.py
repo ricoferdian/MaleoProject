@@ -23,6 +23,9 @@ class ClassifierModel():
     def __init__(self,classifier, *args):
         self.classifier = classifier
 
+    def setModule(self, classifier):
+        self.classifier = classifier
+
     def getName(self):
         return self.classifier.getName()
 

@@ -21,9 +21,7 @@ in preprocessing tab from main GUI application
 """
 
 # PyQt5 GUI Library
-from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
 
 # Python Library
 import os
@@ -31,13 +29,13 @@ import os
 # Third Party Library
 
 # Data operation
-from maleo.src.utils.CSVLoader import CSVLoader
-from maleo.src.utils.JSONLoader import JSONLoader
-from maleo.src.utils.ExcelLoader import ExcelLoader
-from maleo.src.utils.SPSSLoader import SPSSLoader
-from maleo.src.utils.SASLoader import SASLoader
-from maleo.src.utils.PickleLoader import PickleLoader
-from maleo.src.utils.StataLoader import StataLoader
+from maleo.src.utils.DatasetLoader.CSVLoader import CSVLoader
+from maleo.src.utils.DatasetLoader.JSONLoader import JSONLoader
+from maleo.src.utils.DatasetLoader.ExcelLoader import ExcelLoader
+from maleo.src.utils.DatasetLoader.SPSSLoader import SPSSLoader
+from maleo.src.utils.DatasetLoader.SASLoader import SASLoader
+from maleo.src.utils.DatasetLoader.PickleLoader import PickleLoader
+from maleo.src.utils.DatasetLoader.StataLoader import StataLoader
 
 class FileOperationWidget(QWidget):
     def __init__(self, parent, dataModel):
@@ -72,6 +70,7 @@ class FileOperationWidget(QWidget):
                                               ";SAS v7 File (*.sas7bpgm);"+
                                               ";Stata File (*.dta);"+
                                               ";Python Pickle File (*.P);"+
+                                                ";Python Pickle File (*.pkl);"+
                                               ";Python Pickle File (*.pickle)")
         if path:
             self.filePath = path
@@ -88,9 +87,9 @@ class FileOperationWidget(QWidget):
                                                   ";SAS v7 File (*.sas7bpgm);"+
                                                   ";Stata File (*.dta);"+
                                                   ";Python Pickle File (*.P);"+
+                                                  ";Python Pickle File (*.pkl);"+
                                                   ";Python Pickle File (*.pickle)")
-
-            if not path:
+            if path:
                 self.filePath = path
                 self.saveDataModel()
         else:
@@ -118,6 +117,8 @@ class FileOperationWidget(QWidget):
         elif self.filePath.lower().endswith('.dta'):
             self.dataLoader = StataLoader(self.filePath)
         elif self.filePath.lower().endswith('.P'):
+            self.dataLoader = PickleLoader(self.filePath)
+        elif self.filePath.lower().endswith('.pkl'):
             self.dataLoader = PickleLoader(self.filePath)
         elif self.filePath.lower().endswith('.pickle'):
             self.dataLoader = PickleLoader(self.filePath)

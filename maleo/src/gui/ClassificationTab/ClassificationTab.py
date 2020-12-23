@@ -20,9 +20,7 @@ This part of python program consist of the classification tab from main GUI appl
 """
 
 # PyQt5 GUI Library
-from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
 
 # Python Library
 
@@ -34,13 +32,13 @@ from maleo.src.gui.ClassificationTab.ClassifierOutputWidget import ClassifierOut
 from maleo.src.gui.ClassificationTab.ResultListWidget import ResultListWidget
 from maleo.src.gui.ClassificationTab.TestOptionWidget import TestOptionWidget
 from maleo.src.gui.ClassificationTab.ModuleOperationWidget import ModuleOperationWidget
-from maleo.src.utils.PandasDatatypeCheck import PandasDatatypeCheck
+from maleo.src.utils.DatasetLoader.PandasDatatypeCheck import PandasDatatypeCheck
 
 # Module
 from maleo.src.model.ClassifierModel import ClassifierModel
 
 class ClassificationTab(QWidget):
-    def __init__(self, parent, dataModel, screenHeight, screenWidth):
+    def __init__(self, parent, dataModel, classifierResults, screenHeight, screenWidth):
         super(QWidget, self).__init__(parent)
         self.dataModel = dataModel
         self.module = None

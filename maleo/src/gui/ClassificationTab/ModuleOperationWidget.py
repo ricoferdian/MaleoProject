@@ -21,16 +21,13 @@ in preprocessing tab from main GUI application
 """
 
 # PyQt5 GUI Library
-from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
 
 # Python Library
-import sys
 
 # Third Party Library
 
-from maleo.src.utils.PandasDatatypeCheck import PandasDatatypeCheck
+from maleo.src.utils.DatasetLoader.PandasDatatypeCheck import PandasDatatypeCheck
 
 class ModuleOperationWidget(QWidget):
     def __init__(self, parent, dataModel):

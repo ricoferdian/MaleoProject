@@ -39,23 +39,37 @@ from maleo.src.gui.ClassificationTab.ClassificationTab import ClassificationTab
 
 # Data model accross project
 from maleo.src.model.DataModel import DataModel
+from maleo.src.model.ModelResults import ModelResults
+from maleo.src.utils.ProjectLoader.ProjectLoader import ProjectLoader
 
 class MainWindow(QMainWindow):
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         global screenWidth
         global screenHeight
+        self._want_to_close = False
+
+        self.dataModel = DataModel(None)
+        self.modelResults = ModelResults()
+        self.projectLoader = ProjectLoader(self.dataModel, self.modelResults)
+
+        self.mainMenu = self.menuBar()
+        self.fileMenu = self.mainMenu.addMenu('File')
+        self.editMenu = self.mainMenu.addMenu('Edit')
+        self.viewMenu = self.mainMenu.addMenu('View')
+        self.searchMenu = self.mainMenu.addMenu('Search')
+        self.toolsMenu = self.mainMenu.addMenu('Tools')
+        self.helpMenu = self.mainMenu.addMenu('Help')
+
+        self.initFileMenu()
 
         self.tabs = QTabWidget()
-        
-        self.dataModel = DataModel([])
-
         self.tab1 = PreprocessingTab(self, self.dataModel, screenHeight, screenWidth)
-        self.tab2 = ClassificationTab(self, self.dataModel, screenHeight, screenWidth)
-        self.tab3 = ClusteringTab(self, self.dataModel, screenHeight, screenWidth)
+        self.tab2 = ClassificationTab(self, self.dataModel, self.modelResults, screenHeight, screenWidth)
+        self.tab3 = ClusteringTab(self, self.dataModel, self.modelResults, screenHeight, screenWidth)
         # self.tab4 = AssociationTab(self, self.dataModel, screenHeight, screenWidth)
         # self.tab5 = AttributeTab(self, self.dataModel, screenHeight, screenWidth)
-        self.tab6 = VisualizationTab(self, self.dataModel, screenHeight, screenWidth)
+        self.tab6 = VisualizationTab(self, self.dataModel, self.modelResults, screenHeight, screenWidth)
 
         self.tabs.resize(500,200)
         self.tabs.addTab(self.tab1, "Preprocessing")
@@ -76,6 +90,38 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.tabs)
         self.show()
 
+    def initFileMenu(self):
+        openButton = QAction('Open project', self)
+        openButton.setStatusTip('Open project')
+        openButton.triggered.connect(self.openProject)
+        self.fileMenu.addAction(openButton)
+
+        saveButton = QAction('Save project', self)
+        saveButton.setShortcut('Ctrl+S')
+        saveButton.setStatusTip('Save project')
+        saveButton.triggered.connect(self.saveProject)
+        self.fileMenu.addAction(saveButton)
+
+        exitButton = QAction('Exit', self)
+        exitButton.setShortcut('Ctrl+Q')
+        exitButton.setStatusTip('Exit application')
+        exitButton.triggered.connect(self.close)
+        self.fileMenu.addAction(exitButton)
+
+    def openProject(self):
+        path, _ = QFileDialog.getOpenFileName(self, "Open file", "", "Maleo project files (*.mlp)")
+        if path:
+            self.projectPath = path
+            self.projectLoader.loadProject(path)
+            self.tab1.loadData()
+            self.dataLoaded()
+
+    def saveProject(self):
+        path, _ = QFileDialog.getSaveFileName(self, "Save file", "", "Maleo project files (*.mlp)")
+        if path:
+            self.projectPath = path
+            self.projectLoader.saveProject(path)
+
     def dataLoaded(self):
         self.tabs.setTabEnabled(1,True)
         self.tabs.setTabEnabled(2,True)
@@ -83,26 +129,39 @@ class MainWindow(QMainWindow):
         self.tabs.setTabEnabled(4,True)
         self.tabs.setTabEnabled(5,True)
 
-        self.loadClassificationData()
-        # self.loadClusteringDataModel()
-        # self.loadAssociationDataModel()
-        # self.loadAttributeDataModel()
-        self.loadVisualizationDataModel()
-
-    def loadClassificationData(self):
         self.tab2.loadData()
-
-    # def loadClusteringDataModel(self):
-    #     self.tab3.loadData()
-    #
-    # def loadAssociationDataModel(self):
-    #     self.tab4.loadData()
-    #
-    # def loadAttributeDataModel(self):
-    #     self.tab5.loadData()
-
-    def loadVisualizationDataModel(self):
+        # self.tab3.loadData()
+        # self.tab4.loadData()
+        # self.tab5.loadData()
         self.tab6.loadData()
+
+    def closeEvent(self, event):
+        self.exitConfirmation()
+        if not self._want_to_close:
+            event.ignore()
+
+    def exitConfirmation(self):
+        dlg = QMessageBox()
+        dlg.setIcon(QMessageBox.Question)
+        dlg.setWindowTitle("Confirmation")
+        dlg.setText("Are you sure you want to quit ?")
+        dlg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        dlg.setDefaultButton(QMessageBox.No)
+        buttonYes = dlg.button(QMessageBox.Yes)
+        buttonYes.setText("Yes")
+        buttonNo = dlg.button(QMessageBox.No)
+        buttonNo.setText("No")
+        dlg.exec_()
+
+        if dlg.clickedButton() == buttonYes:
+            self._want_to_close = True
+            qApp.quit()
+
+    def dialog_critical(self, message):
+        dlg = QMessageBox(self)
+        dlg.setText(message)
+        dlg.setIcon(QMessageBox.Critical)
+        dlg.show()
 
 def runMainWindow():
     global screenWidth

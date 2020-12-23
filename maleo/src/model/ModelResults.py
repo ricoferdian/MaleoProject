@@ -16,25 +16,28 @@ MainWindow
 Copyright (C) 2020 Henrico Aldy Ferdian & Lennia Savitri Azzahra Loviana
 Udayana University, Bali, Indonesia
 
-This part of python program consist of the clustering tab from main GUI application
+This part of python program consist of the visualization tab from main GUI application
 """
 
-# PyQt5 GUI Library
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
+class ModelResults():
+    def __init__(self, *args):
+        self.classifiers = []
+        self.clusterers = []
 
-# Python Library
-import sys
+    def addClassifierModules(self, classifier):
+        self.classifiers.append(classifier)
 
-# Third Party Library
+    def removeClassifierModules(self, index):
+        self.classifiers[index] = None
 
-class ClusteringTab(QWidget):
-    def __init__(self, parent, dataModel, modelResults, screenHeight, screenWidth):
-        super(QWidget, self).__init__(parent)
-        self.layout = QVBoxLayout(self)
+    def getClassifierModules(self):
+        return self.classifiers
 
-        self.pushButton1 = QPushButton("Coming Soon !")
+    def addClustererModules(self, clusterer):
+        self.clusterers.append(clusterer)
 
-        self.layout.addWidget(self.pushButton1)
-        self.setLayout(self.layout)
+    def removeClustererModules(self, index):
+        self.clusterers[index] = None
+
+    def getClustererModules(self):
+        return self.clusterers

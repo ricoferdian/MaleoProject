@@ -21,19 +21,15 @@ in preprocessing tab from main GUI application
 """
 
 # PyQt5 GUI Library
-from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
 
 # Python Library
-import sys
 
 # Third Party Library
-import csv
 
 
 # GUI Table View Library
-from maleo.src.utils.TableView import TableView
+from maleo.src.utils.DatasetLoader.TableView import TableView
 
 class DataAttributeWidget(QWidget):
     def __init__(self, parent, dataModel):
