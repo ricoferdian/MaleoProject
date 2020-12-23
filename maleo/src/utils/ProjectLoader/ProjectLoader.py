@@ -66,10 +66,11 @@ class ProjectLoader():
 
     def writeZipFile(self):
         zipf = zipfile.ZipFile(self.path, "w", zipfile.ZIP_DEFLATED)
-        # Zipfile handling adder
+
         for root, dirs, files in os.walk(self.tempdir):
             for file in files:
                 zipf.write(os.path.join(root, file), file)
+
         zipf.close()
 
     def tempDataFrame(self):

@@ -48,8 +48,8 @@ class FileOperationWidget(QWidget):
         self.fileOperationLayout = QHBoxLayout()
         self.fileOperationGroup.setLayout(self.fileOperationLayout)
 
-        self.openFileButton = QPushButton("Open File")
-        self.saveFileButton = QPushButton("Save File")
+        self.openFileButton = QPushButton("Open Dataset File")
+        self.saveFileButton = QPushButton("Save Dataset File")
 
         self.openFileButton.clicked.connect(self.openFile)
         self.saveFileButton.clicked.connect(self.saveFile)

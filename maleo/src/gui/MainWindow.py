@@ -42,12 +42,16 @@ from maleo.src.model.DataModel import DataModel
 from maleo.src.model.ModelResults import ModelResults
 from maleo.src.utils.ProjectLoader.ProjectLoader import ProjectLoader
 
+# Python library
+import os
+
 class MainWindow(QMainWindow):
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         global screenWidth
         global screenHeight
         self._want_to_close = False
+        self.projectPath = None
 
         self.dataModel = DataModel(None)
         self.modelResults = ModelResults()
@@ -88,6 +92,7 @@ class MainWindow(QMainWindow):
         self.tab1.dataLoadedSignal.connect(self.dataLoaded)
 
         self.setCentralWidget(self.tabs)
+        self.update_title()
         self.show()
 
     def initFileMenu(self):
@@ -96,11 +101,16 @@ class MainWindow(QMainWindow):
         openButton.triggered.connect(self.openProject)
         self.fileMenu.addAction(openButton)
 
-        saveButton = QAction('Save project', self)
+        saveButton = QAction('Save Project', self)
         saveButton.setShortcut('Ctrl+S')
         saveButton.setStatusTip('Save project')
         saveButton.triggered.connect(self.saveProject)
         self.fileMenu.addAction(saveButton)
+
+        saveAsButton = QAction('Save Project As', self)
+        saveAsButton.setStatusTip('Save project as')
+        saveAsButton.triggered.connect(self.saveAsProject)
+        self.fileMenu.addAction(saveAsButton)
 
         exitButton = QAction('Exit', self)
         exitButton.setShortcut('Ctrl+Q')
@@ -109,18 +119,29 @@ class MainWindow(QMainWindow):
         self.fileMenu.addAction(exitButton)
 
     def openProject(self):
-        path, _ = QFileDialog.getOpenFileName(self, "Open file", "", "Maleo project files (*.mlp)")
+        path, _ = QFileDialog.getOpenFileName(self, "Open file", "", "Maleo project files (*.maleo)")
         if path:
             self.projectPath = path
             self.projectLoader.loadProject(path)
             self.tab1.loadData()
             self.dataLoaded()
+            self.update_title()
 
     def saveProject(self):
-        path, _ = QFileDialog.getSaveFileName(self, "Save file", "", "Maleo project files (*.mlp)")
+        if self.projectPath:
+            self.projectLoader.saveProject(self.projectPath)
+        else:
+            self.saveAsProject()
+
+    def saveAsProject(self):
+        path, _ = QFileDialog.getSaveFileName(self, "Save file", "", "Maleo project files (*.maleo)")
         if path:
             self.projectPath = path
             self.projectLoader.saveProject(path)
+            self.update_title()
+
+    def update_title(self):
+        self.setWindowTitle("Maleo Project - %s" % (self.projectPath if self.projectPath else "Untitled"))
 
     def dataLoaded(self):
         self.tabs.setTabEnabled(1,True)

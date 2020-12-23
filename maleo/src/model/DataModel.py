@@ -37,7 +37,9 @@ class DataModel():
         return self.relation
 
     def isEmpty(self):
-        return self.data.empty
+        if self.data is not None:
+            return self.data.empty
+        return True
 
     def getData(self):
         return self.data
