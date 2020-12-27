@@ -1,5 +1,5 @@
-from maleo.src.gui.MainWindow import runMainWindow
+from maleo.src.gui.main_window import run_main_window
 
 # Run main program
 if __name__ == '__main__':
-    runMainWindow()
+    run_main_window()
