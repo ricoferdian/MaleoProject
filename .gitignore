@@ -132,3 +132,7 @@ maleo/src/gui/__pycache__/
 maleo/src/gui/messagebox/
 .idea/.gitignore
 .idea/misc.xml
+.idea/MaleoProject.iml
+.idea/inspectionProfiles/
+.idea/modules.xml
+.idea/vcs.xml
