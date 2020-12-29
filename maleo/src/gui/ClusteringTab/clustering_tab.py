@@ -80,7 +80,7 @@ class ClusteringTab(QWidget):
             self.moduleOperationWidget.setLabelDropDown()
             self.set_clusterer_data(self.attributes, self.labels)
         else:
-            self.dialog_critical("No data received !")
+            self.dialog_critical("Data is empty !")
 
     def set_module_object(self, moduleObject):
         self.module = moduleObject("tes", "label")

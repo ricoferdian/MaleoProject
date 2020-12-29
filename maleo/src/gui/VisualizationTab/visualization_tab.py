@@ -57,7 +57,7 @@ class VisualizationTab(QWidget):
             except Exception as e:
                 self.dialog_critical("Error exception "+str(e))
         else:
-            self.dialog_critical("No data received !")
+            self.dialog_critical("Data is empty !")
 
     def plot(self):
         for widget in self.visualizationWidgets:

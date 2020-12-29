@@ -90,7 +90,7 @@ class DatasetEditor(QDialog):
         clear_action = menu.addAction("Undo")
         add_instance = menu.addAction("Add Instance")
         delete_instance = menu.addAction("Delete Selected Instance")
-        # delete_all_instance = menu.addAction("Delete ALL Selected Instance")
+        delete_all_instance = menu.addAction("Delete ALL Selected Instance")
 
         if self.dataHistory.is_empty():
             clear_action.setEnabled(False)
@@ -105,19 +105,21 @@ class DatasetEditor(QDialog):
             self._add_instance()
         elif action == delete_instance:
             self._delete_instances(False)
-        # elif action == delete_all_instance:
-        #     self._delete_instances(True)
+        elif action == delete_all_instance:
+            self._delete_instances(True)
 
     def _delete_instances(self, is_all):
         selected_rows = self.dataAttributeTable.selectionModel().selectedRows()
+        num_deleted_row = 0
         for selected_row in selected_rows:
             row = selected_row.row()
             self.dataHistory.append_data({"row": row, "col": "all_deletion", "value": self.data})
 
-            self.data.drop(index=row, axis=0, inplace=True)
+            self.data.drop(index=row - num_deleted_row, axis=0, inplace=True)
             self.data.reset_index(inplace=True, drop=True)
-            self.dataAttributeTable.deleteRow(row)
+            self.dataAttributeTable.deleteRow(row - num_deleted_row)
 
+            num_deleted_row += 1
             if not is_all:
                 break
         self.update_status()
@@ -170,7 +172,10 @@ class DatasetEditor(QDialog):
     def show(self):
         super(QDialog, self).show()
         self.data = self.dataModel.get_copy()
-        self._show_table()
+        try:
+            self._show_table()
+        except Exception as e:
+            self.parent().parent().dialog_critical("Error exception !"+str(e))
 
     def _show_table(self):
         if not self.dataModel.is_empty():

@@ -58,7 +58,7 @@ class MysqlConnectionDialog(QDialog):
 
         self.username = QLineEdit("root")
         self.password = QLineEdit("")
-        self.password.setEchoMode(QLineEdit.EchoMode.PasswordEchoOnEdit)
+        self.password.setEchoMode(QLineEdit.Password)
         self.host = QLineEdit("localhost")
         self.database = QLineEdit("*")
         self.query = QLineEdit()
@@ -92,11 +92,13 @@ class MysqlConnectionDialog(QDialog):
         query = self.query.text()
 
         self.dataLoader.setConnection(username, password, host, database)
-        self.dataLoader.loadData(query)
-
-        self.dataModel.set_data(self.dataLoader.getData())
-        self.parent().parent().data_loaded()
-        self.close()
+        try:
+            self.dataLoader.loadData(query)
+            self.dataModel.set_data(self.dataLoader.getData())
+            self.parent().parent().data_loaded()
+            self.close()
+        except Exception as e:
+            self.parent().parent().dialog_critical("Error exception !\n"+str(e))
 
     def on_ok(self):
         self.close()

@@ -73,6 +73,7 @@ class FileOperationWidget(QWidget):
 
         self.undoOperationButton.setEnabled(False)
         self.editDatasetButton.setEnabled(False)
+        self.saveDatasetButton.setEnabled(False)
 
         self.fileOperationLayout.addWidget(self.openDatasetButton)
         self.fileOperationLayout.addWidget(self.openDatabaseButton)
@@ -112,12 +113,17 @@ class FileOperationWidget(QWidget):
         self.parent().data_loaded()
 
     def _edit_dataset(self):
-        self.datasetEditor.show()
+        if not self.datasetEditor.isVisible():
+            self.datasetEditor.show()
+        else:
+            self.parent().dialog_critical("Editor already running !")
 
     def update_status(self):
         if self.dataModel.is_empty():
             self.editDatasetButton.setEnabled(False)
+            self.saveDatasetButton.setEnabled(False)
         else:
+            self.saveDatasetButton.setEnabled(True)
             self.editDatasetButton.setEnabled(True)
 
         if self.dataHistory.is_empty():
@@ -139,7 +145,11 @@ class FileOperationWidget(QWidget):
                                               ";Python Pickle File (*.pickle)")
         if path:
             self.filePath = path
-            self._load_data_model()
+
+            try:
+                self._load_data_model()
+            except Exception as e:
+                self.parent().dialog_critical("Error exception !\n"+str(e))
 
     def save_file(self):
         if not self.dataModel.is_empty():

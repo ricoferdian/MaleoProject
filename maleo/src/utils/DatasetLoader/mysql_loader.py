@@ -34,10 +34,7 @@ class MysqlLoader():
         self.db_connection = create_engine(db_connection_str)
 
     def loadData(self, query):
-        try:
-            self.data = pd.read_sql(query, con=self.db_connection)
-        except Exception as e:
-            print("Error exception : ", e)
+        self.data = pd.read_sql(query, con=self.db_connection)
 
     def getData(self):
         return self.data

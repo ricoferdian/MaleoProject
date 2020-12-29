@@ -79,11 +79,11 @@ class MainWindow(QMainWindow):
 
         self.tabs.resize(500, 200)
         self.tabs.addTab(self.tab1, "Preprocessing")
-        self.tabs.addTab(self.tab2, "Klasifikasi")
+        self.tabs.addTab(self.tab2, "Classification")
         self.tabs.addTab(self.tab3, "Clustering")
-        # self.tabs.addTab(self.tab4, "Asosiasi")
-        # self.tabs.addTab(self.tab5, "Pilih Atribut")
-        self.tabs.addTab(self.tab6, "Visualisasi")
+        # self.tabs.addTab(self.tab4, "Association")
+        # self.tabs.addTab(self.tab5, "Select Attributes")
+        self.tabs.addTab(self.tab6, "Visualization")
 
         self.tabs.setTabEnabled(1, False)
         self.tabs.setTabEnabled(2, False)
