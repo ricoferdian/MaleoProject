@@ -136,3 +136,15 @@ maleo/src/gui/messagebox/
 .idea/inspectionProfiles/
 .idea/modules.xml
 .idea/vcs.xml
+maleo/lib/__pycache__/
+maleo/src/gui/associationtab/__pycache__/
+maleo/src/gui/attributetab/__pycache__/
+maleo/src/gui/classificationtab/__pycache__/
+maleo/src/gui/clusteringtab/__pycache__/
+maleo/src/gui/dialog/__pycache__/
+maleo/src/gui/preprocessingtab/__pycache__/
+maleo/src/gui/visualizationtab/__pycache__/
+maleo/src/model/__pycache__/
+maleo/src/utils/__pycache__/
+maleo/src/utils/datasetloader/__pycache__/
+maleo/src/utils/projectloader/__pycache__/
