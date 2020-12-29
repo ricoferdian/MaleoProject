@@ -108,7 +108,7 @@ class FileOperationWidget(QWidget):
                 self._undo_operation()
 
     def _undo_operation(self):
-        data = self.dataHistory.pop_data()
+        data = self.dataHistory.pop_past()
         self.dataModel.set_data(data)
         self.parent().data_loaded()
 
@@ -118,7 +118,8 @@ class FileOperationWidget(QWidget):
         else:
             self.parent().dialog_critical("Editor already running !")
 
-    def update_status(self):
+    def load_data(self):
+        self.datasetEditor.load_data()
         if self.dataModel.is_empty():
             self.editDatasetButton.setEnabled(False)
             self.saveDatasetButton.setEnabled(False)
@@ -126,7 +127,7 @@ class FileOperationWidget(QWidget):
             self.saveDatasetButton.setEnabled(True)
             self.editDatasetButton.setEnabled(True)
 
-        if self.dataHistory.is_empty():
+        if self.dataHistory.is_past_empty():
             self.undoOperationButton.setEnabled(False)
         else:
             self.undoOperationButton.setEnabled(True)

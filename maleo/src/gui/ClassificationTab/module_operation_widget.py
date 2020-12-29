@@ -37,7 +37,7 @@ class ModuleOperationWidget(QWidget):
         self.supported = []
         self.unsupported = []
 
-        self.moduleOperationGroup = QGroupBox("classification Operation")
+        self.moduleOperationGroup = QGroupBox("Classification Operation")
         self.moduleOperationLayout = QVBoxLayout()
         self.moduleOperationGroup.setLayout(self.moduleOperationLayout)
 

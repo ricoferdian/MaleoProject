@@ -25,18 +25,18 @@ from collections import deque
 
 class DataHistory():
     def __init__(self, *args):
-        self.dataStack = deque()
+        self.pastStack = deque()
 
     def append_data(self, data):
-        self.dataStack.append(data)
+        self.pastStack.append(data)
 
-    def pop_data(self):
-        return self.dataStack.pop()
+    def pop_past(self):
+        return self.pastStack.pop()
 
-    def is_empty(self):
-        if self.dataStack:
+    def is_past_empty(self):
+        if self.pastStack:
             return False
         return True
 
     def get_data(self):
-        return self.dataStack
+        return self.pastStack

@@ -45,13 +45,16 @@ class ClusteringTab(QWidget):
         self.module = None
 
         self.layout = QVBoxLayout(self)
+        self.layout.setSpacing(0)
 
         self.classifierWidget = ClusteringWidget(self)
         self.dataTypeCheck = PandasDatatypeCheck()
 
         self.testLayout = QHBoxLayout()
+        self.testLayout.setSpacing(0)
 
         self.leftTestLayout = QVBoxLayout()
+        self.leftTestLayout.setSpacing(0)
         self.testOptionWidget = TestOptionWidget(self)
         self.moduleOperationWidget = ModuleOperationWidget(self, self.dataModel)
         self.resultListWidget = ResultListWidget(self)
@@ -60,6 +63,7 @@ class ClusteringTab(QWidget):
         self.leftTestLayout.addWidget(self.resultListWidget,stretch=40)
 
         self.rightTestLayout = QVBoxLayout()
+        self.rightTestLayout.setSpacing(0)
         self.classifierOutputWidget = ClusteringOutputWidget(self)
         self.rightTestLayout.addWidget(self.classifierOutputWidget)
 

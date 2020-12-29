@@ -45,10 +45,12 @@ class PreprocessingTab(QWidget):
         self.dataHitory = data_history
 
         self.layout = QVBoxLayout(self)
+        self.layout.setSpacing(0)
 
         self.fileOperationWidget = FileOperationWidget(self, self.dataModel, self.dataHitory)
         self.attributeLayout = QHBoxLayout()
         self.leftAttributeLayout = QVBoxLayout()
+        self.leftAttributeLayout.setSpacing(0)
 
         self.currentRelationWidget = CurrentRelationWidget(self, self.dataModel)
         self.dataAttributeWidget = DataAttributeWidget(self, self.dataModel, self.dataHitory)
@@ -58,6 +60,7 @@ class PreprocessingTab(QWidget):
         self.rightAttributeLayout = QVBoxLayout()
         self.selectAttributeWidget = SelectAttributeWidget(self, self.dataModel)
         self.rightAttributeLayout.addWidget(self.selectAttributeWidget)
+        self.rightAttributeLayout.setSpacing(0)
 
         self.attributeLayout.addLayout(self.leftAttributeLayout, stretch=50)
         self.attributeLayout.addLayout(self.rightAttributeLayout, stretch=50)
@@ -74,7 +77,7 @@ class PreprocessingTab(QWidget):
 
     def data_loaded(self):
         self.dataLoadedSignal.emit()
-        self.fileOperationWidget.update_status()
+        self.fileOperationWidget.load_data()
         self.currentRelationWidget.load_data()
         self.dataAttributeWidget.load_data()
         self.selectAttributeWidget.load_data()

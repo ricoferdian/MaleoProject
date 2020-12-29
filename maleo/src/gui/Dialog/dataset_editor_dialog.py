@@ -92,7 +92,7 @@ class DatasetEditor(QDialog):
         delete_instance = menu.addAction("Delete Selected Instance")
         delete_all_instance = menu.addAction("Delete ALL Selected Instance")
 
-        if self.dataHistory.is_empty():
+        if self.dataHistory.is_past_empty():
             clear_action.setEnabled(False)
         else:
             clear_action.setEnabled(True)
@@ -113,7 +113,7 @@ class DatasetEditor(QDialog):
         num_deleted_row = 0
         for selected_row in selected_rows:
             row = selected_row.row()
-            self.dataHistory.append_data({"row": row, "col": "all_deletion", "value": self.data})
+            self.dataHistory.append_data({"row": row, "col": "all_deletion", "value": self.data.copy()})
 
             self.data.drop(index=row - num_deleted_row, axis=0, inplace=True)
             self.data.reset_index(inplace=True, drop=True)
@@ -144,38 +144,40 @@ class DatasetEditor(QDialog):
                 self.isUndoConfirmed = True
                 self._undo_operation()
 
-    def update_status(self):
-        if self.dataHistory.is_empty():
-            self.undoButton.setEnabled(False)
-        else:
-            self.undoButton.setEnabled(True)
-
-    def _undo_operation(self):
-        data = self.dataHistory.pop_data()
-        self.update_status()
-        self._setTableItemData(data["row"], data["col"], data["value"])
-
-    def _setTableItemData(self, row, col, value):
-        if col == "all_insertion":
-            self.dataAttributeTable.cellChanged.disconnect()
-            self.dataAttributeTable.deleteRow(row)
-            self.dataAttributeTable.cellChanged.connect(self._data_changed)
-        elif col == "all_deletion":
-            self.dataAttributeTable.cellChanged.disconnect()
-            self.dataAttributeTable.appendRow(value)
-            self.dataAttributeTable.cellChanged.connect(self._data_changed)
-        else:
-            self.dataAttributeTable.cellChanged.disconnect()
-            self.dataAttributeTable.setItemData(row, col, value)
-            self.dataAttributeTable.cellChanged.connect(self._data_changed)
-
-    def show(self):
-        super(QDialog, self).show()
+    def load_data(self):
         self.data = self.dataModel.get_copy()
         try:
             self._show_table()
         except Exception as e:
             self.parent().parent().dialog_critical("Error exception !"+str(e))
+
+    def update_status(self):
+        if self.dataHistory.is_past_empty():
+            self.undoButton.setEnabled(False)
+        else:
+            self.undoButton.setEnabled(True)
+
+    def _undo_operation(self):
+        data = self.dataHistory.pop_past()
+        self.update_status()
+        self._setTableItemData(data["row"], data["col"], data["value"])
+
+    def _setTableItemData(self, row, col, value):
+        if col == "all_insertion":
+            self.data.drop(index=row, axis=0, inplace=True)
+            self.data.reset_index(inplace=True, drop=True)
+
+            self.dataAttributeTable.cellChanged.disconnect()
+            self.dataAttributeTable.deleteRow(row)
+            self.dataAttributeTable.cellChanged.connect(self._data_changed)
+        elif col == "all_deletion":
+            self.data = value
+            self._show_table()
+        else:
+            self.data.iat[row, col] = value
+            self.dataAttributeTable.cellChanged.disconnect()
+            self.dataAttributeTable.setItemData(row, col, value)
+            self.dataAttributeTable.cellChanged.connect(self._data_changed)
 
     def _show_table(self):
         if not self.dataModel.is_empty():
@@ -206,28 +208,31 @@ class DatasetEditor(QDialog):
         self.dataType = self.dataTypeCheck.getDataType()
 
         item = self.dataAttributeTable.item(row, col).text()
+        try:
+            if self.dataType == self.dataTypeCheck.getType().Numeric:
+                if nconvert.is_num(item):
+                    self.dataHistory.append_data({"row": row, "col": col, "value": self.data.iat[row, col].copy()})
+                    self.data.iat[row, col] = nconvert.str_to_num(item)
+                    self.update_status()
+                else:
+                    self.parent().parent().dialog_critical("Cannot update numeric column by nominal value !")
+                    self.dataAttributeTable.setItemData(row, col, self.data.iat[row, col])
 
-        if self.dataType == self.dataTypeCheck.getType().Numeric:
-            if nconvert.is_num(item):
-                self.dataHistory.append_data({"row": row, "col": col, "value": self.data.iat[row, col].copy()})
-                self.data.iat[row, col] = nconvert.str_to_num(item)
-                self.update_status()
+            elif self.dataType == self.dataTypeCheck.getType().Nominal:
+                if not nconvert.is_num(item):
+                    self.dataHistory.append_data({"row": row, "col": col, "value": self.data.iat[row, col]})
+                    self.data.iat[row, col] = item
+                    self.update_status()
+                else:
+                    self.parent().parent().dialog_critical("Cannot update nominal column by numeric value !")
+                    self.dataAttributeTable.setItemData(row, col, self.data.iat[row, col])
+
             else:
-                self.parent().parent().dialog_critical("Cannot update numeric column by nominal value !")
-                self.dataAttributeTable.setItemData(row, col, self.data.iat[row, col])
+                self.parent().parent().dialog_critical("Column datatype is unknown !")
+                print("This col item is unknown")
+        except Exception as e:
+            self.parent().parent().dialog_critical("Error exception !\n"+str(e))
 
-        elif self.dataType == self.dataTypeCheck.getType().Nominal:
-            if not nconvert.is_num(item):
-                self.dataHistory.append_data({"row": row, "col": col, "value": self.data.iat[row, col].copy()})
-                self.data.iat[row, col] = item
-                self.update_status()
-            else:
-                self.parent().parent().dialog_critical("Cannot update nominal column by numeric value !")
-                self.dataAttributeTable.setItemData(row, col, self.data.iat[row, col])
-
-        else:
-            self.parent().parent().dialog_critical("Column datatype is unknown !")
-            print("This col item is unknown")
 
     def _add_instance(self):
         new_row = {}
