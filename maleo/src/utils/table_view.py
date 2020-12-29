@@ -27,6 +27,7 @@ from PyQt5.QtCore import *
 # Python Library
 import sys
 
+
 # Third Party Library
 
 class TableView(QTableWidget):
@@ -37,7 +38,7 @@ class TableView(QTableWidget):
         self.resizeColumnsToContents()
         self.resizeRowsToContents()
 
-    def updateParameter(self,col,row):
+    def updateParameter(self, col, row):
         self.setColumnCount(col)
         self.setRowCount(row)
 
@@ -49,15 +50,24 @@ class TableView(QTableWidget):
 
     def setData(self):
         horHeaders = []
-        # for n, key in enumerate(sorted(self.data.keys())):
         for n, key in enumerate(sorted(self.data.keys())):
             horHeaders.append(key)
             for m, item in enumerate(self.data[key]):
-                item = self.data[key][item]
-                if(isinstance(item, QWidget)):
-                    newitem = item
+                item_val = self.data[key][item]
+                if(isinstance(item_val, QWidget)):
+                    newitem = item_val
                     self.setCellWidget(m, n, newitem)
                 else:
-                    newitem = QTableWidgetItem(str(item))
+                    newitem = QTableWidgetItem(str(item_val))
                     self.setItem(m, n, newitem)
         self.setHorizontalHeaderLabels(horHeaders)
+
+    # def get_data(self):
+    #     data = []
+    #     for row in range(self.rowCount()):
+    #         data.append([])
+    #         for column in range(self.columnCount()):
+    #             index = self.index(row, column)
+    #             # We suppose data are strings
+    #             data[row].append(str(self.data(index).toString()))
+    #     return data

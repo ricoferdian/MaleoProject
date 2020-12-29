@@ -91,7 +91,7 @@ class ModuleOperationWidget(QWidget):
                 self.parent().setLabel(i)
 
     def setLabelDropDown(self):
-        self.data = self.dataModel.getData()
+        self.data = self.dataModel.get_data()
         self.selectLabelDropDown.clear()
         self.headers = list(self.data.columns)
         self.headerIndex = {}

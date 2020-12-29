@@ -29,13 +29,15 @@ from PyQt5.QtWidgets import *
 
 
 # GUI Table View Library
-from maleo.src.utils.datasetloader.table_view import TableView
+from maleo.src.utils.table_view import TableView
 
 
 class DataAttributeWidget(QWidget):
-    def __init__(self, parent, data_model):
+    def __init__(self, parent, data_model, data_history):
         super(QWidget, self).__init__(parent)
         self.dataModel = data_model
+        self.dataHistory = data_history
+
         self.data = None
         self.header = None
 
@@ -77,10 +79,10 @@ class DataAttributeWidget(QWidget):
 
     def change_selected_attribute_parent(self):
         items = self.dataAttributeTable.selectedItems()
-        self.parent().changeSelectedAttribute(items)
+        self.parent().change_selected_attribute(items)
 
     def load_data(self):
-        self.data = self.dataModel.getData()
+        self.data = self.dataModel.get_data()
         self.header = list(self.data.columns)
 
         if len(self.header):
@@ -89,11 +91,11 @@ class DataAttributeWidget(QWidget):
             self.header[" No"] = {i: i+1 for i in range(len(self.header[first_key]))}
             self.header["."] = {i: QCheckBox() for i in range(len(self.header[first_key]))}
 
-            self.draw_table(self.header, len(self.header[first_key]), len(self.header))
+            self._draw_table(self.header, len(self.header[first_key]), len(self.header))
         else:
-            self.draw_table({}, 0, 0)
+            self._draw_table({}, 0, 0)
 
-    def draw_table(self, data, row, col):
+    def _draw_table(self, data, row, col):
         self.dataAttributeTable.updateParameter(col, row)
         self.dataAttributeTable.updateData(data)
         self.dataAttributeTable.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)
@@ -125,5 +127,6 @@ class DataAttributeWidget(QWidget):
         if len(list(self.data.columns)) == len(indexes):
             self.parent().dialog_critical("Cannot remove all attributes from data !")
         else:
-            self.dataModel.removeColumn(indexes)
-            self.parent().dataLoaded()
+            self.dataHistory.append_data(self.dataModel.get_copy())
+            self.dataModel.remove_column(indexes)
+            self.parent().data_loaded()

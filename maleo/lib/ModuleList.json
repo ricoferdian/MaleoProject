@@ -1,5 +1,8 @@
 {
-  "Classification": {
-    "NeuralNetwork":["ANN","RNN_NLP"]
+  "classification": {
+    "neuralnetwork":["ANN","RNN_NLP"]
+  },
+  "clustering": {
+    "kmeans":["KMeansClustering"]
   }
 }

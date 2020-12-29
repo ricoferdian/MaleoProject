@@ -24,35 +24,45 @@ class DataModel():
         self.data = data
         self.relation = "None"
 
-    def setData(self, data):
+    def set_data(self, data):
         self.data = data
 
-    def getShape(self):
+    def get_shape(self):
         return self.data.shape
 
-    def setRelation(self, relation):
+    def set_relation(self, relation):
         self.relation = relation
 
-    def getRelation(self):
+    def get_relation(self):
         return self.relation
 
-    def isEmpty(self):
+    def is_empty(self):
         if self.data is not None:
             return self.data.empty
         return True
 
-    def getData(self):
+    def get_data(self):
         return self.data
 
-    def toExcel(self, path, index=False):
+    def get_copy(self):
+        return self.data.copy()
+
+    def to_excel(self, path, index=False):
         self.data.to_excel(path, index=index)
 
-    def toCSV(self, path, index=False):
+    def to_csv(self, path, index=False):
         self.data.to_csv(path, index=index)
 
-    def toJSON(self, path, index=False):
+    def to_json(self, path, index=False):
         self.data.to_json(path, index=index)
 
-    def removeColumn(self,indexes):
+    def update_value(self, row_index, col_index, value):
+        self.data.at[row_index, col_index] = value
+
+    def remove_rows(self, indexes):
+        if len(self.data.shape[0]):
+            self.data.drop(index=[self.data.columns[index] for index in indexes], axis=0,inplace=True)
+
+    def remove_column(self, indexes):
         if len(self.data.columns):
             self.data.drop(columns=[self.data.columns[index] for index in indexes], axis=1,inplace=True)

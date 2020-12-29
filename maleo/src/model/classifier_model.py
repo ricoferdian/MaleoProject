@@ -23,23 +23,23 @@ class ClassifierModel():
     def __init__(self,classifier, *args):
         self.classifier = classifier
 
-    def setModule(self, classifier):
+    def set_module(self, classifier):
         self.classifier = classifier
 
-    def getName(self):
-        return self.classifier.getName()
+    def get_name(self):
+        return self.classifier.get_name()
 
-    def saveToPath(self, path):
-        self.classifier.saveToPath(path)
+    def save_to_path(self, path):
+        self.classifier.save_to_path(path)
 
-    def getModel(self):
+    def get_model(self):
         return self.classifier
 
-    def getHistory(self):
-        return self.classifier.getHistory()
+    def get_history(self):
+        return self.classifier.get_history()
 
     def start(self):
-        self.classifier.startOperation()
+        self.classifier.start_operation()
 
     def stop(self):
-        self.classifier.stopOperation()
+        self.classifier.stop_operation()

@@ -76,7 +76,7 @@ class ClassifierWidget(QWidget):
 
     def setDataModel(self, dataModel):
         self.dataModel = dataModel
-        self.data = self.dataModel.getData()
+        self.data = self.dataModel.get_data()
 
     def toggleClassifierWidget(self, toggle):
         self.selectClassifierButton.setEnabled(toggle)

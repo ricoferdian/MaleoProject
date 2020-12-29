@@ -46,8 +46,8 @@ class ModuleSettingDialog(QDialog):
         self.settings = None
         self.moduleDataTypeCheck = ModuleDataTypeParamCheck()
 
-        self.btnJalankan = QPushButton("OK")
-        self.btnJalankan.clicked.connect(self.on_ok)
+        self.okButton = QPushButton("OK")
+        self.okButton.clicked.connect(self.on_ok)
 
         self.setLayout(self.layout)
 
@@ -83,7 +83,7 @@ class ModuleSettingDialog(QDialog):
 
                     self.settingParam[function] = params
                     cidx += 1
-                self.layout.addWidget(self.btnJalankan)
+                self.layout.addWidget(self.okButton)
             except Exception as e:
                 self.close()
                 self.parent().parent().dialog_critical("Error exception : \n"+str(e))
@@ -92,7 +92,7 @@ class ModuleSettingDialog(QDialog):
             self.parent().parent().dialog_critical("System error, settings not set !")
 
     def clear_setting_widget(self):
-        self.layout.removeWidget(self.btnJalankan)
+        self.layout.removeWidget(self.okButton)
         for setting_widget in self.settingWidgets:
             self.layout.removeWidget(setting_widget)
             setting_widget.deleteLater()

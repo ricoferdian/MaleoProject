@@ -39,6 +39,8 @@ from maleo.src.gui.classificationtab.classification_tab import ClassificationTab
 
 # Data object model accross project
 from maleo.src.model.data_model import DataModel
+from maleo.src.model.data_history import DataHistory
+
 from maleo.src.model.model_results import ModelResults
 from maleo.src.utils.projectloader.project_loader import ProjectLoader
 
@@ -52,6 +54,8 @@ class MainWindow(QMainWindow):
         self.projectPath = None
 
         self.dataModel = DataModel(None)
+        self.dataHistory = DataHistory()
+
         self.modelResults = ModelResults()
         self.projectLoader = ProjectLoader(self.dataModel, self.modelResults)
 
@@ -66,7 +70,7 @@ class MainWindow(QMainWindow):
         self.__init_file_menu()
 
         self.tabs = QTabWidget()
-        self.tab1 = PreprocessingTab(self, self.dataModel, screenHeight, screenWidth)
+        self.tab1 = PreprocessingTab(self, self.dataModel,self.dataHistory, screenHeight, screenWidth)
         self.tab2 = ClassificationTab(self, self.dataModel, self.modelResults, screenHeight, screenWidth)
         self.tab3 = ClusteringTab(self, self.dataModel, self.modelResults, screenHeight, screenWidth)
         # self.tab4 = associationtab(self, self.data_model, screen_height, screen_width)
@@ -148,8 +152,8 @@ class MainWindow(QMainWindow):
         self.tabs.setTabEnabled(4, True)
         self.tabs.setTabEnabled(5, True)
 
-        self.tab2.loadData()
-        # self.tab3.load_data()
+        self.tab2.load_data()
+        self.tab3.load_data()
         # self.tab4.load_data()
         # self.tab5.load_data()
         self.tab6.load_data()

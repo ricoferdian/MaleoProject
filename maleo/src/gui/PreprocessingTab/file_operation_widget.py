@@ -37,12 +37,21 @@ from maleo.src.utils.datasetloader.sas_loader import SASLoader
 from maleo.src.utils.datasetloader.pickle_loader import PickleLoader
 from maleo.src.utils.datasetloader.stata_loader import StataLoader
 
+# GUI part
+from maleo.src.gui.dialog.dataset_editor_dialog import DatasetEditor
+from maleo.src.gui.dialog.mysql_connection_dialog import MysqlConnectionDialog
+
 
 class FileOperationWidget(QWidget):
-    def __init__(self, parent, data_model):
+    def __init__(self, parent, data_model, data_history):
         super(QWidget, self).__init__(parent)
+
         self.dataModel = data_model
+        self.dataHistory = data_history
         self.filePath = None
+        self.isUndoConfirmed = False
+        self.datasetEditor = DatasetEditor(self, data_model, data_history)
+        self.mysqlDialog = MysqlConnectionDialog(self, self.dataModel)
 
         self.layout = QHBoxLayout(self)
 
@@ -50,17 +59,71 @@ class FileOperationWidget(QWidget):
         self.fileOperationLayout = QHBoxLayout()
         self.fileOperationGroup.setLayout(self.fileOperationLayout)
 
-        self.openFileButton = QPushButton("Open Dataset File")
-        self.saveFileButton = QPushButton("Save Dataset File")
+        self.openDatasetButton = QPushButton("Open Dataset")
+        self.openDatabaseButton = QPushButton("Open From Database")
+        self.undoOperationButton = QPushButton("Undo Operation")
+        self.editDatasetButton = QPushButton("Edit Dataset")
+        self.saveDatasetButton = QPushButton("Save Dataset")
 
-        self.openFileButton.clicked.connect(self.open_file)
-        self.saveFileButton.clicked.connect(self.save_file)
+        self.openDatasetButton.clicked.connect(self.open_file)
+        self.openDatabaseButton.clicked.connect(self._open_database)
+        self.undoOperationButton.clicked.connect(self._undo_confirmation)
+        self.editDatasetButton.clicked.connect(self._edit_dataset)
+        self.saveDatasetButton.clicked.connect(self.save_file)
 
-        self.fileOperationLayout.addWidget(self.openFileButton)
-        self.fileOperationLayout.addWidget(self.saveFileButton)
+        self.undoOperationButton.setEnabled(False)
+        self.editDatasetButton.setEnabled(False)
+
+        self.fileOperationLayout.addWidget(self.openDatasetButton)
+        self.fileOperationLayout.addWidget(self.openDatabaseButton)
+        self.fileOperationLayout.addWidget(self.undoOperationButton)
+        self.fileOperationLayout.addWidget(self.editDatasetButton)
+        self.fileOperationLayout.addWidget(self.saveDatasetButton)
 
         self.layout.addWidget(self.fileOperationGroup)
         self.setLayout(self.layout)
+
+    def _open_database(self):
+        self.mysqlDialog.show()
+
+    def _undo_confirmation(self):
+        if self.isUndoConfirmed:
+            self._undo_operation()
+        else:
+            dlg = QMessageBox()
+            dlg.setIcon(QMessageBox.Question)
+            dlg.setWindowTitle("Confirmation")
+            dlg.setText("Are you sure you want to undo the last action ? This action cannot be undone.")
+            dlg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+            dlg.setDefaultButton(QMessageBox.No)
+            button_yes = dlg.button(QMessageBox.Yes)
+            button_yes.setText("Yes")
+            button_no = dlg.button(QMessageBox.No)
+            button_no.setText("No")
+            dlg.exec_()
+
+            if dlg.clickedButton() == button_yes:
+                self.isUndoConfirmed = True
+                self._undo_operation()
+
+    def _undo_operation(self):
+        data = self.dataHistory.pop_data()
+        self.dataModel.set_data(data)
+        self.parent().data_loaded()
+
+    def _edit_dataset(self):
+        self.datasetEditor.show()
+
+    def update_status(self):
+        if self.dataModel.is_empty():
+            self.editDatasetButton.setEnabled(False)
+        else:
+            self.editDatasetButton.setEnabled(True)
+
+        if self.dataHistory.is_empty():
+            self.undoOperationButton.setEnabled(False)
+        else:
+            self.undoOperationButton.setEnabled(True)
 
     def open_file(self):
         path, _ = QFileDialog.getOpenFileName(self, "Open file", "", "Comma Separated Value (*.csv);" +
@@ -79,7 +142,7 @@ class FileOperationWidget(QWidget):
             self._load_data_model()
 
     def save_file(self):
-        if not self.dataModel.isEmpty():
+        if not self.dataModel.is_empty():
             path, _ = QFileDialog.getSaveFileName(self, "Save file", "", "Comma Separated Value (*.csv);" +
                                                   ";Javascript Object Notation (*.json);" +
                                                   ";Excel 2003-2007 Document (*.xls);" +
@@ -129,18 +192,17 @@ class FileOperationWidget(QWidget):
             return
 
         self.dataLoader.loadData()
-        self.dataModel.setData(self.dataLoader.getData())
-        print("data", self.dataModel.getData())
-        self.parent().dataLoaded()
+        self.dataModel.set_data(self.dataLoader.getData())
+        self.parent().data_loaded()
 
     def _save_data_model(self):
         if self.filePath.lower().endswith('.csv'):
-            self.dataModel.toCSV(self.filePath)
+            self.dataModel.to_csv(self.filePath)
         elif self.filePath.lower().endswith('.json'):
-            self.dataModel.toJSON(self.filePath)
+            self.dataModel.to_json(self.filePath)
         elif self.filePath.lower().endswith('.xls'):
-            self.dataModel.toExcel(self.filePath)
+            self.dataModel.to_excel(self.filePath)
         elif self.filePath.lower().endswith('.xlsx'):
-            self.dataModel.toExcel(self.filePath)
+            self.dataModel.to_excel(self.filePath)
         else:
             self.parent().dialog_critical("Unknown file extension to save !")

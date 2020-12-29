@@ -28,7 +28,7 @@ from PyQt5.QtWidgets import *
 # Third Party Library
 
 from maleo.src.utils.datasetloader.pandas_datatype_check import *
-from maleo.src.utils.datasetloader.table_view import TableView
+from maleo.src.utils.table_view import TableView
 
 
 class SelectAttributeWidget(QWidget):
@@ -77,7 +77,7 @@ class SelectAttributeWidget(QWidget):
         self.setLayout(self.layout)
 
     def load_data(self):
-        self.data = self.dataModel.getData()
+        self.data = self.dataModel.get_data()
 
     def update_widget(self, values):
         if len(values):

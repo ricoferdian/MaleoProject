@@ -24,20 +24,20 @@ class ModelResults():
         self.classifiers = []
         self.clusterers = []
 
-    def addClassifierModules(self, classifier):
+    def add_classifier_modules(self, classifier):
         self.classifiers.append(classifier)
 
-    def removeClassifierModules(self, index):
+    def remove_classifier_modules(self, index):
         self.classifiers[index] = None
 
-    def getClassifierModules(self):
+    def get_classifier_modules(self):
         return self.classifiers
 
-    def addClustererModules(self, clusterer):
+    def add_clusterer_modules(self, clusterer):
         self.clusterers.append(clusterer)
 
-    def removeClustererModules(self, index):
+    def remove_clusterer_modules(self, index):
         self.clusterers[index] = None
 
-    def getClustererModules(self):
+    def get_clusterer_modules(self):
         return self.clusterers

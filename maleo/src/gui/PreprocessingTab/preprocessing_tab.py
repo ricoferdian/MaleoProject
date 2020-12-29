@@ -39,18 +39,19 @@ from maleo.src.gui.preprocessingtab.select_attribute_widget import SelectAttribu
 class PreprocessingTab(QWidget):
     dataLoadedSignal = pyqtSignal()
 
-    def __init__(self, parent, data_model, screen_height, screen_width):
+    def __init__(self, parent, data_model, data_history, screen_height, screen_width):
         super(QWidget, self).__init__(parent)
         self.dataModel = data_model
+        self.dataHitory = data_history
 
         self.layout = QVBoxLayout(self)
 
-        self.fileOperationWidget = FileOperationWidget(self, self.dataModel)
+        self.fileOperationWidget = FileOperationWidget(self, self.dataModel, self.dataHitory)
         self.attributeLayout = QHBoxLayout()
         self.leftAttributeLayout = QVBoxLayout()
 
         self.currentRelationWidget = CurrentRelationWidget(self, self.dataModel)
-        self.dataAttributeWidget = DataAttributeWidget(self, self.dataModel)
+        self.dataAttributeWidget = DataAttributeWidget(self, self.dataModel, self.dataHitory)
         self.leftAttributeLayout.addWidget(self.currentRelationWidget)
         self.leftAttributeLayout.addWidget(self.dataAttributeWidget)
 
@@ -73,6 +74,7 @@ class PreprocessingTab(QWidget):
 
     def data_loaded(self):
         self.dataLoadedSignal.emit()
+        self.fileOperationWidget.update_status()
         self.currentRelationWidget.load_data()
         self.dataAttributeWidget.load_data()
         self.selectAttributeWidget.load_data()

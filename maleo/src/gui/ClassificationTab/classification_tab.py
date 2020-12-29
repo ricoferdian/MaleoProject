@@ -70,19 +70,19 @@ class ClassificationTab(QWidget):
         self.layout.addLayout(self.testLayout, stretch=90)
         self.setLayout(self.layout)
 
-    def loadData(self):
-        self.data = self.dataModel.getData()
+    def load_data(self):
+        self.data = self.dataModel.get_data()
 
         self.attributes = self.data.iloc[:,:-1]
         self.labels = self.data.iloc[:,-1:]
 
-        if not self.dataModel.isEmpty():
+        if not self.dataModel.is_empty():
             self.moduleOperationWidget.setLabelDropDown()
-            self.setClassifierData(self.attributes, self.labels)
+            self.set_classifier_data(self.attributes, self.labels)
         else:
             self.dialog_critical("No data received !")
 
-    def setModuleObject(self, moduleObject):
+    def set_module_object(self, moduleObject):
         self.module = moduleObject("tes", "label")
         self.moduleSettings = self.module.getAvailableSettings()
 
@@ -91,27 +91,27 @@ class ClassificationTab(QWidget):
 
         self.moduleOperationWidget.updateSupportedOperationType(self.moduleSupportedOperation,self.moduleUnsupportedOperation)
         self.classifierWidget.setModule(self.module)
-        self.setClassifierData(self.attributes, self.labels)
+        self.set_classifier_data(self.attributes, self.labels)
 
-    def setClassifierData(self, data, labels):
+    def set_classifier_data(self, data, labels):
         if self.module:
-            self.module.setData(data, labels)
+            self.module.set_data(data, labels)
 
-    def getData(self):
+    def get_data(self):
         print("self.parent()",self.parent())
 
-    def setData(self, index):
+    def set_data(self, index):
         self.attributes = self.data.drop(columns=self.data.columns[index], axis=1)
-        self.setClassifierData(self.attributes, self.labels)
+        self.set_classifier_data(self.attributes, self.labels)
 
-    def setLabel(self, index):
+    def set_label(self, index):
         self.labels = self.data.iloc[:, index]
-        self.setData(index)
+        self.set_data(index)
 
-    def setClassifierModel(self):
+    def set_classifier_model(self):
         self.classifierModel = ClassifierModel(self.module)
 
-    def startOperation(self):
+    def start_operation(self):
         value, option =  self.testOptionWidget.getTestOption()
 
         try:
@@ -120,7 +120,7 @@ class ClassificationTab(QWidget):
             self.module.setDatasetParam(value, option)
             self.module.setOutputWidget(self.classifierOutputWidget.getOutputWidget())
 
-            self.setClassifierModel()
+            self.set_classifier_model()
 
             self.classifierWidget.toggleClassifierWidget(False)
             self.testOptionWidget.toggleTestOptionWidget(False)
@@ -135,10 +135,10 @@ class ClassificationTab(QWidget):
         except Exception as e:
             self.dialog_critical("Error !"+str(e))
 
-    def showClassifierOutput(self, classifierIndex):
+    def show_classifier_output(self, classifierIndex):
         self.classifierOutputWidget.showOutput(classifierIndex)
 
-    def stopOperation(self):
+    def stop_operation(self):
         print("Stopping Operation")
         self.classifierModel.stop()
         self.classifierOutputWidget.stopListenOutput()

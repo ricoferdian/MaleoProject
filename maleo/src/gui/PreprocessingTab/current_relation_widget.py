@@ -64,9 +64,9 @@ class CurrentRelationWidget(QWidget):
         self.setLayout(self.layout)
 
     def load_data(self):
-        self.dataShape = self.dataModel.getShape()
-        if not self.dataModel.isEmpty():
-            self.relationLabel.setText("Relation : "+str(self.dataModel.getRelation()))
+        self.dataShape = self.dataModel.get_shape()
+        if not self.dataModel.is_empty():
+            self.relationLabel.setText("Relation : " + str(self.dataModel.get_relation()))
             self.instancesLabel.setText("Instances : "+str(self.dataShape[0]))
             self.attributesLabel.setText("Attributes : "+str(self.dataShape[1]))
             self.sumWeightsLabel.setText("Sum Weights : "+str(self.dataShape[0]))

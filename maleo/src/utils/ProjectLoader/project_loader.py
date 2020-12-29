@@ -31,8 +31,8 @@ class ProjectLoader:
         self.path = None
         self.tempdir = None
         self.dataModel = data_model
-        self.classifier = model_results.getClassifierModules()
-        self.clusterer = model_results.getClustererModules()
+        self.classifier = model_results.get_classifier_modules()
+        self.clusterer = model_results.get_clusterer_modules()
 
     def set_classifier(self, classifier):
         self.classifier = classifier
@@ -52,7 +52,7 @@ class ProjectLoader:
         archive = zipfile.ZipFile(self.path, "r")
         pickle_dataframe = archive.open("dataframe.pkl")
         data = pickle.load(pickle_dataframe)
-        self.dataModel.setData(data)
+        self.dataModel.set_data(data)
 
     def save_project(self, path):
         try:
@@ -76,6 +76,6 @@ class ProjectLoader:
         zipf.close()
 
     def _temp_dataframe(self):
-        if not self.dataModel.isEmpty():
+        if not self.dataModel.is_empty():
             with open(os.path.join(self.tempdir, "dataframe.pkl"), 'wb') as output:
-                pickle.dump(self.dataModel.getData(), output, pickle.HIGHEST_PROTOCOL)
+                pickle.dump(self.dataModel.get_data(), output, pickle.HIGHEST_PROTOCOL)

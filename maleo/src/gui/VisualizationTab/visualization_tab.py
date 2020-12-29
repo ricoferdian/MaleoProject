@@ -50,8 +50,8 @@ class VisualizationTab(QWidget):
         self.setLayout(self.layout)
 
     def load_data(self):
-        self.data = self.dataModel.getData()
-        if not self.dataModel.isEmpty():
+        self.data = self.dataModel.get_data()
+        if not self.dataModel.is_empty():
             try:
                 self.plot()
             except Exception as e:
@@ -81,8 +81,8 @@ class VisualizationTab(QWidget):
 
             plot.addItem(bar)
             plot.setTitle(column)
-            # plot.setLabel('left', 'Value')
-            # plot.setLabel('bottom', 'Range')
+            # plot.set_label('left', 'Value')
+            # plot.set_label('bottom', 'Range')
 
             self.visualizationWidgets.append(plot)
             self.layout.addWidget(plot, row, col)

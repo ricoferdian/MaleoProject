@@ -50,11 +50,11 @@ class SelectClassifierDialog(QDialog):
 
         self.moduleListWidget = QListWidget()
 
-        self.btnJalankan = QPushButton("OK")
-        self.btnJalankan.clicked.connect(self.on_ok)
+        self.okButton = QPushButton("OK")
+        self.okButton.clicked.connect(self.on_ok)
 
         self.layout.addWidget(self.moduleListWidget)
-        self.layout.addWidget(self.btnJalankan)
+        self.layout.addWidget(self.okButton)
 
         self.setLayout(self.layout)
 
