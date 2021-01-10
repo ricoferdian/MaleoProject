@@ -53,7 +53,7 @@ class PlotModelResultDialog(QDialog):
         self.accPlotWidget.addLegend()
 
         self.trainAccPlot = self.accPlotWidget.plot([], [], pen=pg.mkPen('r', width=3), name="Training accuracy")
-        self.valAccPlot = self.accPlotWidget.plot([], [], pen=pg.mkPen('b', width=3), name="Training accuracy")
+        self.valAccPlot = self.accPlotWidget.plot([], [], pen=pg.mkPen('b', width=3), name="Validation accuracy")
 
         self.accPlotWidget.setTitle("Training and validation accuracy")
         self.accPlotWidget.setLabel('left', 'Accuracy')
@@ -62,7 +62,7 @@ class PlotModelResultDialog(QDialog):
         self.lossPlotWidget.addLegend()
 
         self.trainLossPlot = self.lossPlotWidget.plot([], [], pen=pg.mkPen('r', width=3), name="Training loss")
-        self.valLossPlot = self.lossPlotWidget.plot([], [], pen=pg.mkPen('b', width=3), name="Training loss")
+        self.valLossPlot = self.lossPlotWidget.plot([], [], pen=pg.mkPen('b', width=3), name="Validation loss")
 
         self.lossPlotWidget.setTitle("Training and validation loss")
         self.lossPlotWidget.setLabel('left', 'Loss')
