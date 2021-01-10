@@ -33,7 +33,6 @@ from maleo.lib.classification.neuralnetwork.neural_network import NeuralNetwork
 class RNN_NLP(NeuralNetwork):
     def __init__(self, data, labels, *args):
         super(RNN_NLP, self).__init__(data, labels)
-        self.activationFunction = "relu"
         self.name = "Recurrent Neural Network for Natural Language Processing"
         self.set_nlp_params()
         self.optimizer = "adam"
@@ -137,15 +136,6 @@ class RNN_NLP(NeuralNetwork):
                     }
                 }
             },
-            "set_activation_function": {
-                "name": "Fungsi Aktivasi",
-                "params": {
-                    "param1": {
-                        "type": "DataType.DropDown",
-                        "options": ["sigmoid", "relu"]
-                    }
-                }
-            },
             "setNumEpochs": {
                 "name": "Jumlah Epochs",
                 "params": {
@@ -164,14 +154,56 @@ class RNN_NLP(NeuralNetwork):
                     }
                 }
             },
+            "set_optimizer": {
+                "name": "Optimizer",
+                "params": {
+                    "param1": {
+                        "type": "DataType.DropDown",
+                        "options": [
+                            "adam",
+                            "adagrad",
+                            "sgd",
+                            "rmsprop",
+                            "adamax",
+                            "ftrl",
+                            "nadam"
+                        ]
+                    }
+                }
+            },
             "set_neural_network": {
                 "name": "Network Builder",
                 "params": {
                     "param1": {
                         "type": "DataType.NetworkBuilder",
                         "networks": self.networks,
-                        "layers": ["dense", "flatten", "bidirectional_GRU", "bidirectional_LSTM", "embedding"],
-                        "activations": ["default", "sigmoid", "relu"]
+                        "layers": [
+                            "dense",
+                            "flatten",
+                            "bidirectional_GRU",
+                            "bidirectional_LSTM",
+                            "embedding"
+                            "lstm",
+                            "lstm_cell",
+                            "gru",
+                            "gru_cell",
+                            "simple_rnn",
+                            "simple_rnn_cell"
+                        ],
+                        "activations": [
+                            "default",
+                            tf.keras.activations.serialize(tf.keras.activations.sigmoid),
+                            tf.keras.activations.serialize(tf.keras.activations.relu),
+                            tf.keras.activations.serialize(tf.keras.activations.selu),
+                            tf.keras.activations.serialize(tf.keras.activations.elu),
+                            tf.keras.activations.serialize(tf.keras.activations.exponential),
+                            tf.keras.activations.serialize(tf.keras.activations.hard_sigmoid),
+                            tf.keras.activations.serialize(tf.keras.activations.linear),
+                            tf.keras.activations.serialize(tf.keras.activations.softmax),
+                            tf.keras.activations.serialize(tf.keras.activations.softsign),
+                            tf.keras.activations.serialize(tf.keras.activations.softplus),
+                            tf.keras.activations.serialize(tf.keras.activations.tanh)
+                        ]
                     }
                 }
             }
@@ -247,9 +279,6 @@ class RNN_NLP(NeuralNetwork):
     def get_unsupported_operations(self):
         return None
 
-    def set_activation_function(self, param1=None):
-        self.activationFunction = param1
-
     def start_operation(self):
         try:
             self.proc = multiprocessing.Process(target=self.train(), args=())
@@ -311,7 +340,7 @@ class RNN_NLP(NeuralNetwork):
         self.model = tf.keras.Sequential()
         if index == 0:
             self.model.add(tf.keras.layers.Embedding(self.vocab_size, self.embedding_dim, input_length=self.max_length))
-        elif index == length-1:
+        elif index == length - 1:
             self.model.add(tf.keras.layers.Dense(units=out, activation=activation))
         else:
             if layer_str == "dense":
@@ -322,13 +351,24 @@ class RNN_NLP(NeuralNetwork):
                 self.model.add(tf.keras.layers.Bidirectional(tf.keras.layers.GRU(units=units, activation=activation)))
             elif layer_str == "bidirectional_LSTM":
                 self.model.add(tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(units=units, activation=activation)))
+            elif layer_str == "lstm":
+                self.model.add(tf.keras.layers.LSTM(units=units, activation=activation))
+            elif layer_str == "lstm_cell":
+                self.model.add(tf.keras.layers.LSTMCell(units=units, activation=activation))
+            elif layer_str == "gru":
+                self.model.add(tf.keras.layers.GRU(units=units, activation=activation))
+            elif layer_str == "gru_cell":
+                self.model.add(tf.keras.layers.GRUCell(units=units, activation=activation))
+            elif layer_str == "simple_rnn":
+                self.model.add(tf.keras.layers.SimpleRNN(units=units, activation=activation))
+            elif layer_str == "simple_rnn_cell":
+                self.model.add(tf.keras.layers.SimpleRNNCell(units=units, activation=activation))
 
     def train(self):
         self.originalStdOut = sys.stdout
         sys.stdout = self.outputWidget
 
         print("Recurrent Neural Network for Natural Language Processing with Tensorflow")
-        print("Activation Function :", self.activationFunction)
         print("Vocan Size :", self.vocab_size)
         print("Embedding Dims :", self.embedding_dim)
         print("Max Length :", self.max_length)
@@ -358,7 +398,7 @@ class RNN_NLP(NeuralNetwork):
                     units = 1
                 self.build_model(layer, activation, units, len(self.networks), index, out)
         except Exception as e:
-            print("Error exception",e)
+            print("Error exception", e)
 
         print("Model Layers :", self.model.layers)
 

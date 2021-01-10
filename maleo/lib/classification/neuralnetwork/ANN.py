@@ -260,7 +260,7 @@ class ANN(NeuralNetwork):
         self.history = self.model.fit(x=self.dtrain, y=self.ltrain, epochs=self.numEpochs, batch_size=self.batchSize,
                                       validation_data=(self.dtest, self.ltest), verbose=1)
 
-        print("Model Summary :")
+        # print("Model Summary :")
         self.model.summary()
-        print("Model Weights :", self.model.weights)
+        # print("Model Weights :", self.model.weights)
         self.stop_operation()
