@@ -181,7 +181,7 @@ class RNN_NLP(NeuralNetwork):
                             "flatten",
                             "bidirectional_GRU",
                             "bidirectional_LSTM",
-                            "embedding"
+                            "embedding",
                             "lstm",
                             "lstm_cell",
                             "gru",
