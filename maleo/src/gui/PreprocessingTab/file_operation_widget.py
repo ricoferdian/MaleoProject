@@ -167,7 +167,10 @@ class FileOperationWidget(QWidget):
                                                   ";Python Pickle File (*.pickle)")
             if path:
                 self.filePath = path
-                self._save_data_model()
+                try:
+                    self._save_data_model()
+                except Exception as e:
+                    self.parent().dialog_critical("Error ezception : \n"+str(e))
         else:
             self.parent().dialog_critical("Cannot save nothing !")
 

@@ -87,7 +87,7 @@ class RNN(NeuralNetwork):
 
         out = self.labels.nunique()
 
-        self.preprocessData()
+        self.preprocess_data()
 
         self.ltrain = tf.keras.utils.to_categorical(self.ltrain, out)
         self.ltest = tf.keras.utils.to_categorical(self.ltest, out)

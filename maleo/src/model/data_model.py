@@ -54,7 +54,7 @@ class DataModel():
         self.data.to_csv(path, index=index)
 
     def to_json(self, path, index=False):
-        self.data.to_json(path, index=index)
+        self.data.to_json(path)
 
     def update_value(self, row_index, col_index, value):
         self.data.at[row_index, col_index] = value

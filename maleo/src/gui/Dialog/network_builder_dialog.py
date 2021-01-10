@@ -123,20 +123,54 @@ class NetworkBuilderDialog(QDialog):
         self.networkData["networks"][0]["editable"] = False
         self.networkData["networks"][len(self.networkData["networks"])-1]["editable"] = False
 
+        self.network = self.networkData["networks"]
         self.networkTable.updateData(self.network, self.networkLayers, self.activationFunctions,
                                      len(self.network), 3)
+        self.networkTable.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)
+        self.networkTable.horizontalHeader().setStretchLastSection(True)
 
-    def add_network(self, row_index):
-        new_layer =
+    def remove_network(self, row_index):
+        network = self.network
+        network.pop(row_index)
 
-        self.networkData["networks"] = new_networks
+        self.networkData["networks"] = network
+
         for index, network in enumerate(self.networkData["networks"]):
             self.networkData["networks"][index]["editable"] = True
         self.networkData["networks"][0]["editable"] = False
         self.networkData["networks"][len(self.networkData["networks"])-1]["editable"] = False
 
+        self.network = self.networkData["networks"]
         self.networkTable.updateData(self.network, self.networkLayers, self.activationFunctions,
                                      len(self.network), 3)
+        self.networkTable.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)
+        self.networkTable.horizontalHeader().setStretchLastSection(True)
+
+    def add_network(self, row_index):
+        top_layer = self.network[:row_index]
+        print("top_layer",top_layer)
+        if top_layer is None:
+            top_layer = []
+        top_layer.append(self.network[1])
+        print("UPDATED top_layer",top_layer)
+        bottom_layer = self.network[row_index:]
+        print("bottom_layer",bottom_layer)
+        for layer in bottom_layer:
+            top_layer.append(layer)
+        print("NETWORK ADDED",top_layer)
+
+        self.networkData["networks"] = top_layer
+
+        for index, network in enumerate(self.networkData["networks"]):
+            self.networkData["networks"][index]["editable"] = True
+        self.networkData["networks"][0]["editable"] = False
+        self.networkData["networks"][len(self.networkData["networks"])-1]["editable"] = False
+
+        self.network = self.networkData["networks"]
+        self.networkTable.updateData(self.network, self.networkLayers, self.activationFunctions,
+                                     len(self.network), 3)
+        self.networkTable.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)
+        self.networkTable.horizontalHeader().setStretchLastSection(True)
 
     def delete_item(self):
         try:
@@ -145,31 +179,31 @@ class NetworkBuilderDialog(QDialog):
             if self.selectedRowIndex != 0 and self.selectedRowIndex != len(self.network) - 1:
                 print("Able to add")
             else:
-                self.parent().parent().dialog_critical("Cannot delete input or output layer")
+                self.parent().parent().parent().dialog_critical("Cannot delete input or output layer")
         except Exception as e:
-            self.parent().parent().dialog_critical("Error exception :\n" + str(e))
+            self.parent().parent().parent().dialog_critical("Error exception :\n" + str(e))
 
     def add_above(self):
         try:
             items = self.networkTable.selectedItems()
             self.selectedRowIndex = int(items[0].text()) - 1
             if self.selectedRowIndex != 0:
-                print("Able to add")
+                self.add_network(self.selectedRowIndex)
             else:
-                self.parent().parent().dialog_critical("Cannot add item above input layer")
+                self.parent().parent().parent().dialog_critical("Cannot add item above input layer")
         except Exception as e:
-            self.parent().parent().dialog_critical("Error exception :\n" + str(e))
+            self.parent().parent().parent().dialog_critical("Error exception :\n" + str(e))
 
     def add_below(self):
         try:
             items = self.networkTable.selectedItems()
             self.selectedRowIndex = int(items[0].text()) - 1
             if self.selectedRowIndex != len(self.network) - 1:
-                print("Able to add")
+                self.add_network(self.selectedRowIndex)
             else:
-                self.parent().parent().dialog_critical("Cannot add item below output layer")
+                self.parent().parent().parent().dialog_critical("Cannot add item below output layer")
         except Exception as e:
-            self.parent().parent().dialog_critical("Error exception :\n" + str(e))
+            self.parent().parent().parent().dialog_critical("Error exception :\n" + str(e))
 
     def on_ok(self):
         self.save_network()

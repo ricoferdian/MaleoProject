@@ -33,26 +33,26 @@ class NeuralNetwork(Module):
         self.numEpochs = 100
         self.batchSize = 128
 
-    def nominalToInteger(self, labels):
+    def nominal_to_integer(self, labels):
         if self.uniqueLabels:
             for index, data in enumerate(labels):
                 labels[index] = self.uniqueLabels.find(data)
             return np.array(labels)
 
-    def integerToNominal(self, labels):
+    def integer_to_nominal(self, labels):
         if self.uniqueLabels:
             for index, data in enumerate(labels):
                 labels[index] = self.uniqueLabels[data]
             return np.array(labels)
 
-    def oneHotPredictionToLabel(self, arr_pred):
+    def one_hot_prediction_to_label(self, arr_pred):
         if self.uniqueLabels:
             predictions = ['NONE' for i in arr_pred]
             for index, alf_index in enumerate(arr_pred):
                 predictions[index] = self.uniqueLabels[int(alf_index)]
             return predictions
 
-    def oneHostLabelToLabel(self, arr_onehot_alph):
+    def one_hot_label_to_label(self, arr_onehot_alph):
         if self.uniqueLabels:
             realLabels = ['NONE' for i in arr_onehot_alph]
             for index, subonehot_alph in enumerate(arr_onehot_alph):
@@ -61,7 +61,7 @@ class NeuralNetwork(Module):
                         realLabels[index] = self.uniqueLabels[int(alf_index)]
             return realLabels
 
-    def preprocessData(self):
+    def preprocess_data(self):
         x = self.data.copy()
         y = self.labels.copy()
 
@@ -74,13 +74,13 @@ class NeuralNetwork(Module):
             sorted.sort()
             self.uniqueLabels = ''.join(str(v) for v in sorted)
 
-            y = self.nominalToInteger(y)
+            y = self.nominal_to_integer(y)
 
         self._splitDataset(x, y, self.value)
 
-    def getHistory(self):
+    def get_history(self):
         return self.history
 
-    def saveToPath(self, path):
+    def save_to_path(self, path):
         if self.model:
             self.model.save(path)
