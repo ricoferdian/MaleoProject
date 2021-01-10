@@ -35,6 +35,7 @@ from maleo.src.gui.clusteringtab.clustering_output_widget import ClusteringOutpu
 from maleo.src.gui.clusteringtab.result_list_widget import ResultListWidget
 from maleo.src.gui.clusteringtab.test_option_widget import TestOptionWidget
 from maleo.src.gui.clusteringtab.module_operation_widget import ModuleOperationWidget
+from maleo.src.model.clutering_model import ClusteringModel
 from maleo.src.utils.datasetloader.pandas_datatype_check import PandasDatatypeCheck
 
 
@@ -114,7 +115,7 @@ class ClusteringTab(QWidget):
 
     def set_clusterer_model(self):
         print("Set Model")
-        # self.classifierModel = ClassifierModel(self.module)
+        self.clusteringModel = ClusteringModel(self.module)
 
     def start_operation(self):
         value, option =  self.testOptionWidget.get_test_option()
@@ -129,14 +130,14 @@ class ClusteringTab(QWidget):
 
             self.classifierWidget.toggle_classifier_widget(False)
             self.testOptionWidget.toggle_test_option_widget(False)
-            self.resultListWidget.add_classifier_result(self.classifierModel)
+            self.resultListWidget.add_classifier_result(self.clusteringModel)
             self.classifierOutputWidget.start_listen_output()
 
             print("Starting Operation")
             print(self.attributes)
             print(self.labels)
 
-            self.classifierModel.start()
+            self.clusteringModel.start()
         except Exception as e:
             self.dialog_critical("Error !"+str(e))
 
@@ -145,7 +146,7 @@ class ClusteringTab(QWidget):
 
     def stop_operation(self):
         print("Stopping Operation")
-        self.classifierModel.stop()
+        self.clusteringModel.stop()
         self.classifierOutputWidget.stop_listen_output()
         self.testOptionWidget.toggle_test_option_widget(True)
         self.classifierWidget.toggle_classifier_widget(True)
