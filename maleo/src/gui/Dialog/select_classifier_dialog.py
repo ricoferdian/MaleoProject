@@ -73,7 +73,7 @@ class SelectClassifierDialog(QDialog):
         print("currentItem", current_item)
         if current_item:
             self.selectedModule = current_item.text()
-            self.parent().setClassifier(self.selectedModule)
+            self.parent().set_classifier(self.selectedModule)
         else:
             self.parent().parent().dialog_critical("No module selected ! Selecting last modules")
         self.close()

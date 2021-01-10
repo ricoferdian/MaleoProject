@@ -34,6 +34,7 @@ import importlib
 # GUI part Library
 from maleo.src.gui.dialog.select_clusterer_dialog import SelectClustererDialog
 from maleo.src.gui.dialog.module_setting_dialog import ModuleSettingDialog
+from maleo.src.gui.dialog.network_builder_dialog import NetworkBuilderDialog
 
 
 class ClusteringWidget(QWidget):
@@ -56,33 +57,41 @@ class ClusteringWidget(QWidget):
         self.settingClassifierButton = QPushButton("Parameters")
         self.selectedClassifier.setReadOnly(True)
 
-        self.selectClassifierButton.clicked.connect(self.selectClassifier)
-        self.settingClassifierButton.clicked.connect(self.classifierSettings)
+        self.nnBuilderDialog = NetworkBuilderDialog(self)
+        self.testNNBuilderBtn = QPushButton("NN Builder")
+        self.testNNBuilderBtn.clicked.connect(self.classifier_settings)
+
+        self.selectClassifierButton.clicked.connect(self.select_classifier)
+        self.settingClassifierButton.clicked.connect(self.classifier_settings)
 
         self.classifierSelectLayout.addWidget(self.selectClassifierButton)
         self.classifierSelectLayout.addWidget(self.selectedClassifier)
+        self.classifierSelectLayout.addWidget(self.testNNBuilderBtn)
         self.classifierSelectLayout.addWidget(self.settingClassifierButton)
 
         self.layout.addWidget(self.classifierSelectGroup)
         self.setLayout(self.layout)
 
-    def selectClassifier(self):
+    def nn_builder(self):
+        self.nnBuilderDialog.show()
+
+    def select_classifier(self):
         self.classifierDialog.show()
 
-    def setClassifier(self, moduleName):
+    def set_classifier(self, moduleName):
         self.moduleName = moduleName
         self.selectedClassifier.setText(self.moduleName)
-        self.setModuleObject(self.moduleName)
+        self.set_module_object(self.moduleName)
 
-    def setDataModel(self, dataModel):
+    def set_data_model(self, dataModel):
         self.dataModel = dataModel
         self.data = self.dataModel.get_data()
 
-    def toggleClassifierWidget(self, toggle):
+    def toggle_classifier_widget(self, toggle):
         self.selectClassifierButton.setEnabled(toggle)
         self.settingClassifierButton.setEnabled(toggle)
 
-    def classifierSettings(self):
+    def classifier_settings(self):
         if self.moduleName and self.moduleSettings:
             self.settings = {
                 getattr(self.module, function): {
@@ -98,23 +107,23 @@ class ClusteringWidget(QWidget):
         else:
             self.parent().dialog_critical("No selected modules !")
 
-    def setModuleObject(self, moduleName):
+    def set_module_object(self, moduleName):
         modulepath = importlib.import_module(self.modulePath + moduleName)
         classname = moduleName.split(".")[1]
         moduleObject = getattr(modulepath, classname)
-        self.parent().setModuleObject(moduleObject)
+        self.parent().set_module_object(moduleObject)
 
-    def setModule(self, module):
+    def set_module(self, module):
         self.module = module
-        self.moduleSettings = self.module.getAvailableSettings()
+        self.moduleSettings = self.module.get_available_settings()
 
-    def updateModuleSetting(self, setting):
+    def update_module_setting(self, setting):
         self.moduleSettingValue = setting
         for module, param in self.moduleSettingValue.items():
-            self.callModuleFunction(module, param)
+            self.call_module_function(module, param)
 
-    def callModuleFunction(self, name, params):
+    def call_module_function(self, name, params):
         name(**params)
 
-    def updateParentDataModel(self):
-        self.parent().loadDataModel(self.filePath)
+    def update_parent_data_model(self):
+        self.parent().load_data_model(self.filePath)

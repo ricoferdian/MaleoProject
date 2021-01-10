@@ -23,7 +23,7 @@ from enum import Enum
 
 class ModuleDataTypeParamCheck():
     def __init__(self, *args):
-        self.datatypes = Enum("DataType", "NumericInput TextInput NumericSlider DropDown BooleanDropDown Unknown")
+        self.datatypes = Enum("DataType", "NumericInput TextInput NumericSlider DropDown BooleanDropDown NetworkBuilder Unknown")
 
     def setDataType(self, value):
         self.value = value
@@ -42,5 +42,7 @@ class ModuleDataTypeParamCheck():
             return self.datatypes.DropDown
         elif self.value == str(self.datatypes.BooleanDropDown):
             return self.datatypes.BooleanDropDown
+        elif self.value == str(self.datatypes.NetworkBuilder):
+            return self.datatypes.NetworkBuilder
         else:
             return self.datatypes.Unknown

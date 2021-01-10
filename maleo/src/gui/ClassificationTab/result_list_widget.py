@@ -46,7 +46,7 @@ class ResultListWidget(QWidget):
         self.plotModelResultDialog = PlotModelResultDialog(self)
 
         self.resultList = QListWidget()
-        self.resultList.itemSelectionChanged.connect(self.resultChoiceChanged)
+        self.resultList.itemSelectionChanged.connect(self.result_choice_changed)
 
         self.resultButtonLayout = QHBoxLayout()
         self.saveModelButton = QPushButton("Save Model")
@@ -54,11 +54,11 @@ class ResultListWidget(QWidget):
         self.resultButtonLayout.addWidget(self.saveModelButton)
         # self.resultButtonLayout.addWidget(self.loadModelButton)
 
-        self.saveModelButton.clicked.connect(self.saveModel)
-        # self.loadModelButton.clicked.connect(self.loadModel)
+        self.saveModelButton.clicked.connect(self.save_model)
+        # self.loadModelButton.clicked.connect(self.load_model)
 
         self.plotModelResultButton = QPushButton("Plot Model Result")
-        self.plotModelResultButton.clicked.connect(self.plotModelResult)
+        self.plotModelResultButton.clicked.connect(self.plot_model_result)
 
         self.resultListLayout.addWidget(self.resultList)
         self.resultListLayout.addLayout(self.resultButtonLayout)
@@ -67,14 +67,14 @@ class ResultListWidget(QWidget):
         self.layout.addWidget(self.resultListGroup)
         self.setLayout(self.layout)
 
-    def resultChoiceChanged(self):
+    def result_choice_changed(self):
         try:
             self.selectedItem = self.resultList.selectedIndexes()[0]
-            self.parent().showClassifierOutput(self.selectedItem.row())
+            self.parent().show_classifier_output(self.selectedItem.row())
         except Exception as e:
             self.parent().dialog_critical("No choice !"+str(e))
 
-    def plotModelResult(self):
+    def plot_model_result(self):
         try:
             if self.selectedItem.row() is not None:
                 model = self.classifierModel[self.selectedItem.row()]
@@ -85,7 +85,7 @@ class ResultListWidget(QWidget):
         except Exception as e:
             self.parent().dialog_critical("No model result ! Error : "+str(e))
 
-    def saveModel(self):
+    def save_model(self):
         try:
             if self.selectedItem.row() is not None:
                 path, _ = QFileDialog.getSaveFileName(self, "Save file", "", "HDF 5 (*.h5)")
@@ -99,24 +99,24 @@ class ResultListWidget(QWidget):
         except Exception as e:
             self.parent().dialog_critical("No model result ! Error : "+str(e))
 
-    def loadModel(self):
+    def load_model(self):
         try:
             path, _ = QFileDialog.getOpenFileName(self, "Open file", "", "HDF 5 (*.h5);")
             if path:
-                self.parent().loadModel(path)
+                self.parent().load_model(path)
         except Exception as e:
             self.parent().dialog_critical("No choice !"+str(e))
 
-    def addClassifierResult(self, classifier):
+    def add_classifier_result(self, classifier):
         classifierName = classifier.get_name()
         self.classifierModel.append(classifier)
         self.resultList.addItem(classifierName)
 
-    def openFile(self):
+    def open_file(self):
         path, _ = QFileDialog.getOpenFileName(self, "Open file", "", "Dataset (*.csv *.json *.xls *.xlsx)")
         if path:
             self.filePath = path
-            self.updateParentDataModel()
+            self.update_parent_data_model()
 
-    def updateParentDataModel(self):
-        self.parent().loadDataModel(self.filePath)
+    def update_parent_data_model(self):
+        self.parent().load_data_model(self.filePath)

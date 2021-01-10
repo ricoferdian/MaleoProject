@@ -35,27 +35,35 @@ class ANN(NeuralNetwork):
         self.activationFunction = "relu"
         self.name = "Artificial Neural Network"
 
-    def getName(self):
+    def get_name(self):
         return self.name
 
-    def getSupportedOperations(self):
+    def get_supported_operations(self):
         return "DataType.Numeric", "DataType.Nominal"
 
-    def getUnsupportedOperations(self):
+    def get_unsupported_operations(self):
         return None
 
-    def getAvailableSettings(self):
+    def get_available_settings(self):
         return {
-                "setActivationFunction":{
-                    "name":"Fungsi Aktivasi Hidden Layer",
-                    "params":{
-                        "param1":{
-                                "type":"DataType.DropDown",
-                                "options":["relu","sigmoid","hard_sigmoid","elu","tanh","softplus","softmax"]
-                            }
-                        }
-                    },
-                "setNumEpochs":{
+                # "set_activation_function":{
+                #     "name":"Fungsi Aktivasi Hidden Layer",
+                #     "params":{
+                #         "param1":{
+                #                 "type":"DataType.DropDown",
+                #                 "options":["relu","sigmoid","hard_sigmoid","elu","tanh","softplus","softmax"]
+                #             }
+                #         }
+                #     },
+                # "set_neural_network":{
+                #     "name":"Network Builder",
+                #     "params":{
+                #         "param1":{
+                #                 "type":"DataType.NetworkBuilder"
+                #             }
+                #         }
+                #     },
+                "set_num_epochs":{
                     "name":"Jumlah Epochs",
                     "params":{
                         "param1":{
@@ -64,7 +72,7 @@ class ANN(NeuralNetwork):
                             }
                         }
                     },
-                "setBatchSize":{
+                "set_batch_size":{
                     "name":"Ukuran Batch",
                     "params":{
                         "param1":{
@@ -75,29 +83,29 @@ class ANN(NeuralNetwork):
                     }
                 }
 
-    def setActivationFunction(self, param1=None):
+    def set_activation_function(self, param1=None):
         self.activationFunction = param1
 
-    def setNumEpochs(self, param1=None):
+    def set_num_epochs(self, param1=None):
         try:
             self.numEpochs = int(param1)
         except Exception as e:
             print(e)
 
-    def setBatchSize(self, param1=None):
+    def set_batch_size(self, param1=None):
         try:
             self.batchSize = int(param1)
         except Exception as e:
             print(e)
 
-    def startOperation(self):
+    def start_operation(self):
         try:
             self.proc = multiprocessing.Process(target=self.train(), args=())
             self.proc.start()
         except Exception as e:
             print(e)
 
-    def stopOperation(self):
+    def stop_operation(self):
         print("Artificial Neural Network with Tensorflow stopped")
         sys.stdout = self.originalStdOut
         try:
@@ -105,7 +113,7 @@ class ANN(NeuralNetwork):
         except Exception as e:
             print(e)
 
-    def setOutputWidget(self, output):
+    def set_output_widget(self, output):
         self.outputWidget = output
 
     def train(self):
@@ -140,4 +148,4 @@ class ANN(NeuralNetwork):
         self.history = self.model.fit(x=self.dtrain,y=self.ltrain,epochs=self.numEpochs,batch_size=self.batchSize,validation_data=(self.dtest,self.ltest), verbose=1)
 
         self.model.summary()
-        self.stopOperation()
+        self.stop_operation()

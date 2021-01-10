@@ -32,18 +32,18 @@ class RNN(NeuralNetwork):
         self.activationFunction = "relu"
         self.name = "Recurrent Neural Network"
 
-    def getName(self):
+    def get_name(self):
         return self.name
 
-    def getSupportedOperations(self):
+    def get_supported_operations(self):
         return "DataType.Numeric", "DataType.Nominal"
 
-    def getUnsupportedOperations(self):
+    def get_unsupported_operations(self):
         return None
 
-    def getAvailableSettings(self):
+    def get_available_settings(self):
         return {
-                "setActivationFunction":{
+                "set_activation_function":{
                     "name":"Fungsi Aktivasi",
                     "params":{
                         "param1":{
@@ -54,17 +54,17 @@ class RNN(NeuralNetwork):
                     }
                 }
 
-    def setActivationFunction(self, param1=None):
+    def set_activation_function(self, param1=None):
         self.activationFunction = param1
 
-    def startOperation(self):
+    def start_operation(self):
         try:
             self.proc = multiprocessing.Process(target=self.train(), args=())
             self.proc.start()
         except Exception as e:
             print(e)
 
-    def stopOperation(self):
+    def stop_operation(self):
         print("Recurrent Neural Network with Tensorflow stopped")
         sys.stdout = self.originalStdOut
         try:
@@ -72,7 +72,7 @@ class RNN(NeuralNetwork):
         except Exception as e:
             print(e)
 
-    def setOutputWidget(self, output):
+    def set_output_widget(self, output):
         print("Output widget set",output)
         self.outputWidget = output
 

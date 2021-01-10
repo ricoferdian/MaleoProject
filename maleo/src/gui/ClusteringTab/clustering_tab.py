@@ -81,20 +81,20 @@ class ClusteringTab(QWidget):
         self.labels = self.data.iloc[:,-1:]
 
         if not self.dataModel.is_empty():
-            self.moduleOperationWidget.setLabelDropDown()
+            self.moduleOperationWidget.set_label_drop_down()
             self.set_clusterer_data(self.attributes, self.labels)
         else:
             self.dialog_critical("Data is empty !")
 
     def set_module_object(self, moduleObject):
         self.module = moduleObject("tes", "label")
-        self.moduleSettings = self.module.getAvailableSettings()
+        self.moduleSettings = self.module.get_available_settings()
 
-        self.moduleSupportedOperation = self.module.getSupportedOperations()
-        self.moduleUnsupportedOperation = self.module.getUnsupportedOperations()
+        self.moduleSupportedOperation = self.module.get_supported_operations()
+        self.moduleUnsupportedOperation = self.module.get_supported_operations()
 
-        self.moduleOperationWidget.updateSupportedOperationType(self.moduleSupportedOperation,self.moduleUnsupportedOperation)
-        self.classifierWidget.setModule(self.module)
+        self.moduleOperationWidget.update_supported_operation_type(self.moduleSupportedOperation, self.moduleUnsupportedOperation)
+        self.classifierWidget.set_module(self.module)
         self.set_clusterer_data(self.attributes, self.labels)
 
     def set_clusterer_data(self, data, labels):
@@ -117,20 +117,20 @@ class ClusteringTab(QWidget):
         # self.classifierModel = ClassifierModel(self.module)
 
     def start_operation(self):
-        value, option =  self.testOptionWidget.getTestOption()
+        value, option =  self.testOptionWidget.get_test_option()
 
         try:
             value = float(value)
 
             self.module.setDatasetParam(value, option)
-            self.module.setOutputWidget(self.classifierOutputWidget.getOutputWidget())
+            self.module.set_output_widget(self.classifierOutputWidget.get_output_widget())
 
             self.set_clusterer_model()
 
-            self.classifierWidget.toggleClassifierWidget(False)
-            self.testOptionWidget.toggleTestOptionWidget(False)
-            self.resultListWidget.addClassifierResult(self.classifierModel)
-            self.classifierOutputWidget.startListenOutput()
+            self.classifierWidget.toggle_classifier_widget(False)
+            self.testOptionWidget.toggle_test_option_widget(False)
+            self.resultListWidget.add_classifier_result(self.classifierModel)
+            self.classifierOutputWidget.start_listen_output()
 
             print("Starting Operation")
             print(self.attributes)
@@ -141,14 +141,14 @@ class ClusteringTab(QWidget):
             self.dialog_critical("Error !"+str(e))
 
     def show_clusterer_output(self, classifierIndex):
-        self.classifierOutputWidget.showOutput(classifierIndex)
+        self.classifierOutputWidget.show_output(classifierIndex)
 
     def stop_operation(self):
         print("Stopping Operation")
         self.classifierModel.stop()
-        self.classifierOutputWidget.stopListenOutput()
-        self.testOptionWidget.toggleTestOptionWidget(True)
-        self.classifierWidget.toggleClassifierWidget(True)
+        self.classifierOutputWidget.stop_listen_output()
+        self.testOptionWidget.toggle_test_option_widget(True)
+        self.classifierWidget.toggle_classifier_widget(True)
 
     def dialog_critical(self, message):
         dlg = QMessageBox(self)

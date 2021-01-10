@@ -52,35 +52,35 @@ class ClusteringOutputWidget(QWidget):
         self.layout.addWidget(self.classifierOutputGroup)
         self.setLayout(self.layout)
 
-    def getOutputWidget(self):
+    def get_output_widget(self):
         return self.outputWidget
 
-    def showOutput(self, index):
+    def show_output(self, index):
         if len(self.classifierOutput)>index and not self.isListening:
             output = self.classifierOutput[index]
             self.outputWidget.setPlainText(output)
 
-    def startListenOutput(self):
+    def start_listen_output(self):
         self.outputWidget.setPlainText("")
         self.isListening = True
         # sys.stdout = self.outputWidget
         self.currentIndex = len(self.classifierOutput)
         self.classifierOutput.append("")
 
-    def stopListenOutput(self):
+    def stop_listen_output(self):
         self.isListening = False
         # sys.stdout = self.originalStdout
         output = self.outputWidget.toPlainText()
         self.classifierOutput[self.currentIndex] = output
 
-    def openFile(self):
+    def open_file(self):
         path, _ = QFileDialog.getOpenFileName(self, "Open file", "", "Dataset (*.csv *.json *.xls *.xlsx)")
         if path:
             self.filePath = path
-            self.updateParentDataModel()
+            self.update_parent_data_model()
 
-    def updateParentDataModel(self):
-        self.parent().loadDataModel(self.filePath)
+    def update_parent_data_model(self):
+        self.parent().load_data_model(self.filePath)
 
 class OutputWidget(QPlainTextEdit):
     def write(self, txt):

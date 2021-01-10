@@ -25,7 +25,7 @@ class Module():
         self.labels = labels
         self.split = 1.0
 
-    def setData(self, data, labels):
+    def set_data(self, data, labels):
         self.data = data
         self.labels = labels
 
@@ -46,7 +46,7 @@ class Module():
             self.dtest = x
             self.ltest = y
 
-    def setSplit(self, value):
+    def set_split(self, value):
         self.split = float(value)
 
     def process(self):
@@ -54,14 +54,14 @@ class Module():
         print("Data",self.data)
         print("Label",self.labels)
 
-    def getResults(self):
+    def get_results(self):
         print("Getting Result")
         return "Result tes"
 
-    def getAvailableSettings(self):
+    def get_available_settings(self):
         return None
 
-    def setDatasetParam(self, value, option):
+    def set_dataset_params(self, value, option):
         print("value",value)
         print("option",option)
         self.value = value

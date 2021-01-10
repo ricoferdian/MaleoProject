@@ -52,10 +52,10 @@ class TestOptionWidget(QWidget):
         # self.leftTestLayout.addWidget(self.useCrossValRadioButton)
         self.leftTestLayout.addWidget(self.usePercentageSplitRadioButton)
 
-        self.useTrainSetRadioButton.toggled.connect(self.toggleTrainSet)
+        self.useTrainSetRadioButton.toggled.connect(self.toggle_train_set)
         # self.useSuppliedSetRadioButton.toggled.connect(self.toggleSuppliedSet)
         # self.useCrossValRadioButton.toggled.connect(self.toggleCrossVal)
-        self.usePercentageSplitRadioButton.toggled.connect(self.togglePercentageSplit)
+        self.usePercentageSplitRadioButton.toggled.connect(self.toggle_percentage_split)
 
         self.rightTestLayout = QVBoxLayout()
 
@@ -78,7 +78,7 @@ class TestOptionWidget(QWidget):
         self.layout.addWidget(self.testOptionGroup)
         self.setLayout(self.layout)
 
-    def getTestOption(self):
+    def get_test_option(self):
         if self.useTrainSetRadioButton.isChecked():
             self.testValue = 0
             self.testOption = 1
@@ -97,7 +97,7 @@ class TestOptionWidget(QWidget):
 
         return self.testValue, self.testOption
 
-    def openSuppliedDataset(self):
+    def open_supplied_dataset(self):
         path, _ = QFileDialog.getOpenFileName(self, "Open file", "", "Comma Separated Value (*.csv);"+
                                               ";Javascript Object Notation (*.json);"+
                                               ";Excel 2003-2007 Document (*.xls);"+
@@ -105,19 +105,19 @@ class TestOptionWidget(QWidget):
         if path:
             self.filePath = path
 
-    def toggleTestForm(self,enabled):
+    def toggle_test_form(self, enabled):
         # self.useSuppliedSetButton.setEnabled(False)
         # self.useCrossValInput.setEnabled(False)
         self.usePercentageInput.setEnabled(False)
         if enabled:
             enabled.setEnabled(True)
 
-    def toggleTrainSet(self):
+    def toggle_train_set(self):
         if self.useTrainSetRadioButton.isChecked():
-            self.toggleTestForm(None)
+            self.toggle_test_form(None)
             print("useTrainSetRadioButton")
 
-    def toggleTestOptionWidget(self, toggle):
+    def toggle_test_option_widget(self, toggle):
         self.useTrainSetRadioButton.setEnabled(toggle)
         # self.useSuppliedSetRadioButton.setEnabled(toggle)
         # self.useCrossValRadioButton.setEnabled(toggle)
@@ -125,15 +125,15 @@ class TestOptionWidget(QWidget):
 
     # def toggleSuppliedSet(self):
     #     if self.useSuppliedSetRadioButton.isChecked():
-    #         self.toggleTestForm(self.useSuppliedSetButton)
+    #         self.toggle_test_form(self.useSuppliedSetButton)
     #         print("useSuppliedSetRadioButton")
     #
     # def toggleCrossVal(self):
     #     if self.useCrossValRadioButton.isChecked():
-    #         self.toggleTestForm(self.useCrossValInput)
+    #         self.toggle_test_form(self.useCrossValInput)
     #         print("useCrossValRadioButton")
 
-    def togglePercentageSplit(self):
+    def toggle_percentage_split(self):
         if self.usePercentageSplitRadioButton.isChecked():
-            self.toggleTestForm(self.usePercentageInput)
+            self.toggle_test_form(self.usePercentageInput)
             print("usePercentageSplitRadioButton")

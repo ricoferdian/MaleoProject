@@ -31,6 +31,8 @@ import pyqtgraph as pg
 # Third Party Library
 import numpy as np
 
+from maleo.src.utils.datasetloader.pandas_datatype_check import PandasDatatypeCheck
+
 
 class VisualizationTab(QWidget):
     def __init__(self, parent, data_model, model_results, screen_height, screen_width):
@@ -38,7 +40,20 @@ class VisualizationTab(QWidget):
         self.data = None
         self.dataModel = data_model
 
-        self.layout = QGridLayout(self)
+        self.dataTypeCheck = PandasDatatypeCheck()
+
+        self.layout = QVBoxLayout()
+        self.layout.setSpacing(0)
+
+        self.actionLayout = QHBoxLayout()
+        self.actionLayout.setSpacing(0)
+
+        self.selectLabelDropDown = QComboBox()
+        self.selectLabelDropDown.currentIndexChanged.connect(self.labelSelectionChanged)
+        self.actionLayout.addWidget(self.selectLabelDropDown)
+
+        self.graphLayout = QGridLayout(self)
+        self.graphLayout.setSpacing(0)
 
         self.widthWidget = 4
 
@@ -47,12 +62,29 @@ class VisualizationTab(QWidget):
 
         self.visualizationWidgets = []
 
+        self.layout.addLayout(self.actionLayout)
+        self.layout.addLayout(self.graphLayout)
+
         self.setLayout(self.layout)
+
+    def set_label_drop_down(self):
+        self.selectLabelDropDown.clear()
+        self.headers = list(self.data.columns)
+        for index in range(len(self.headers)):
+            label_data = self.data.iloc[:, index]
+            self.dataTypeCheck.setDataType(label_data)
+            dataType = self.dataTypeCheck.getDataType()
+
+            self.selectLabelDropDown.addItem("("+str(dataType)+") "+self.headers[index])
+
+    def labelSelectionChanged(self, i):
+        self.labels = self.data.iloc[:, i]
 
     def load_data(self):
         self.data = self.dataModel.get_data()
         if not self.dataModel.is_empty():
             try:
+                self.set_label_drop_down()
                 self.plot()
             except Exception as e:
                 self.dialog_critical("Error exception "+str(e))
@@ -61,7 +93,7 @@ class VisualizationTab(QWidget):
 
     def plot(self):
         for widget in self.visualizationWidgets:
-            self.layout.removeWidget(widget)
+            self.graphLayout.removeWidget(widget)
             widget.deleteLater()
             widget = None
         self.visualizationWidgets = []
@@ -77,7 +109,7 @@ class VisualizationTab(QWidget):
             if np.array(x).dtype.char == 'U':
                 x = [i for i in range(len(x))]
 
-            bar = pg.BarGraphItem(x=x, height=y, width=0.1, brush='b', pen=pg.mkPen('b', width=0.1))
+            bar = pg.BarGraphItem(x=x, height=y, width=0.1, brush='b', pen=pg.mkPen('b', width=1))
 
             plot.addItem(bar)
             plot.setTitle(column)
@@ -85,7 +117,7 @@ class VisualizationTab(QWidget):
             # plot.set_label('bottom', 'Range')
 
             self.visualizationWidgets.append(plot)
-            self.layout.addWidget(plot, row, col)
+            self.graphLayout.addWidget(plot, row, col)
 
             col += 1
             if col == 4:

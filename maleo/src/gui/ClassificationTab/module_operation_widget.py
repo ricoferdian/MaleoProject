@@ -44,7 +44,7 @@ class ModuleOperationWidget(QWidget):
         self.dataTypeCheck = PandasDatatypeCheck()
 
         self.selectLabelDropDown = QComboBox()
-        self.selectLabelDropDown.currentIndexChanged.connect(self.labelSelectionChanged)
+        self.selectLabelDropDown.currentIndexChanged.connect(self.label_selection_changed)
 
         self.buttonOperationLayout = QHBoxLayout()
         self.startOperationButton = QPushButton("Start")
@@ -52,8 +52,8 @@ class ModuleOperationWidget(QWidget):
         self.buttonOperationLayout.addWidget(self.startOperationButton)
         self.buttonOperationLayout.addWidget(self.stopOperationButton)
 
-        self.startOperationButton.clicked.connect(self.startOperation)
-        self.stopOperationButton.clicked.connect(self.stopOperation)
+        self.startOperationButton.clicked.connect(self.start_operation)
+        self.stopOperationButton.clicked.connect(self.stop_operation)
 
         self.moduleOperationLayout.addWidget(self.selectLabelDropDown)
         self.moduleOperationLayout.addLayout(self.buttonOperationLayout)
@@ -64,40 +64,40 @@ class ModuleOperationWidget(QWidget):
         self.layout.addWidget(self.moduleOperationGroup)
         self.setLayout(self.layout)
 
-    def startOperation(self):
+    def start_operation(self):
         self.selectLabelDropDown.setEnabled(False)
         self.startOperationButton.setEnabled(False)
         self.stopOperationButton.setEnabled(True)
-        self.parent().startOperation()
+        self.parent().start_operation()
 
-    def stopOperation(self):
+    def stop_operation(self):
         self.selectLabelDropDown.setEnabled(True)
         self.startOperationButton.setEnabled(True)
         self.stopOperationButton.setEnabled(False)
-        self.parent().stopOperation()
+        self.parent().stop_operation()
 
-    def updateSupportedOperationType(self, supported, unsupported):
+    def update_supported_operation_type(self, supported, unsupported):
         self.supported = supported
         self.unsupported = unsupported
         if self.selectLabelDropDown.currentIndex()<len(self.headerIndex) and self.selectLabelDropDown.currentIndex()>=0:
-            self.labelSelectionChanged(self.selectLabelDropDown.currentIndex())
+            self.label_selection_changed(self.selectLabelDropDown.currentIndex())
 
-    def labelSelectionChanged(self, i):
+    def label_selection_changed(self, i):
         self.stopOperationButton.setEnabled(False)
         self.startOperationButton.setEnabled(False)
         if i >= 0 and i<len(self.headerIndex):
             if str(self.headerIndex[i]["data_type"]) in self.supported:
                 self.startOperationButton.setEnabled(True)
-                self.parent().setLabel(i)
+                self.parent().set_label(i)
 
-    def setLabelDropDown(self):
+    def set_label_drop_down(self):
         self.data = self.dataModel.get_data()
         self.selectLabelDropDown.clear()
         self.headers = list(self.data.columns)
         self.headerIndex = {}
         for index in range(len(self.headers)):
-            selectedData = self.data.iloc[:, index]
-            self.dataTypeCheck.setDataType(selectedData)
+            label_data = self.data.iloc[:, index]
+            self.dataTypeCheck.setDataType(label_data)
             dataType = self.dataTypeCheck.getDataType()
 
             self.headerIndex[index] = {"name":self.headers[index],"data_type":dataType}

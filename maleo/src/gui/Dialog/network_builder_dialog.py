@@ -37,7 +37,7 @@ from maleo.lib.classification import *
 from maleo.lib.module_data_type_param_check import ModuleDataTypeParamCheck
 
 
-class ModuleSettingDialog(QDialog):
+class NetworkBuilderDialog(QDialog):
     def __init__(self, parent):
         super(QDialog, self).__init__(parent)
 
@@ -46,9 +46,10 @@ class ModuleSettingDialog(QDialog):
         self.settings = None
         self.moduleDataTypeCheck = ModuleDataTypeParamCheck()
 
-        self.okButton = QPushButton("OK")
+        self.okButton = QPushButton("Save")
         self.okButton.clicked.connect(self.on_ok)
 
+        self.setWindowTitle("Neural Network Builder")
         self.setLayout(self.layout)
 
     def set_settings(self, settings):

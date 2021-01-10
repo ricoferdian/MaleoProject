@@ -34,9 +34,9 @@ class RNN_NLP(NeuralNetwork):
         super(RNN_NLP, self).__init__(data, labels)
         self.activationFunction = "relu"
         self.name = "Recurrent Neural Network for Natural Language Processing"
-        self.setNlpParams()
+        self.set_nlp_params()
 
-    def setNlpParams(self):
+    def set_nlp_params(self):
         self.vocab_size = 1000
         self.embedding_dim = 16
         self.max_length = 120
@@ -48,7 +48,7 @@ class RNN_NLP(NeuralNetwork):
         self.sentences = self.data
         self.labels = []
 
-    def getAvailableSettings(self):
+    def get_available_settings(self):
         return {
             "setVocabSize": {
                 "name": "Ukuran Vocab",
@@ -104,7 +104,7 @@ class RNN_NLP(NeuralNetwork):
                     }
                 }
             },
-            "setActivationFunction": {
+            "set_activation_function": {
                 "name": "Fungsi Aktivasi",
                 "params": {
                     "param1": {
@@ -181,26 +181,26 @@ class RNN_NLP(NeuralNetwork):
         except Exception as e:
             print(e)
 
-    def getName(self):
+    def get_name(self):
         return self.name
 
-    def getSupportedOperations(self):
+    def get_supported_operations(self):
         return "DataType.Numeric", "DataType.Nominal"
 
-    def getUnsupportedOperations(self):
+    def get_unsupported_operations(self):
         return None
 
-    def setActivationFunction(self, param1=None):
+    def set_activation_function(self, param1=None):
         self.activationFunction = param1
 
-    def startOperation(self):
+    def start_operation(self):
         try:
             self.proc = multiprocessing.Process(target=self.train(), args=())
             self.proc.start()
         except Exception as e:
             print(e)
 
-    def stopOperation(self):
+    def stop_operation(self):
         print("Recurrent Neural Network for Natural Language Processing with Tensorflow stopped")
         sys.stdout = self.originalStdOut
         try:
@@ -208,19 +208,19 @@ class RNN_NLP(NeuralNetwork):
         except Exception as e:
             print(e)
 
-    def setOutputWidget(self, output):
+    def set_output_widget(self, output):
         print("Output widget set",output)
         self.outputWidget = output
 
-    def getSentences(self):
+    def get_sentences(self):
         self.sentences = np.array([])
         for colname in self.data:
             data = self.data[colname].to_numpy()
             self.sentences = np.concatenate((self.sentences, data), axis=0)
 
-    def preprocessNlp(self):
+    def preprocess_nlp(self):
         print("Preprocessing data")
-        self.getSentences()
+        self.get_sentences()
         training_sentences = self.sentences[:self.training_size]
         training_labels = self.labels[:self.training_size]
 
@@ -264,7 +264,7 @@ class RNN_NLP(NeuralNetwork):
         if out==2:
             out = 1
 
-        self.preprocessNlp()
+        self.preprocess_nlp()
 
         # self.ltrain = tf.keras.utils.to_categorical(self.ltrain, out)
         # self.ltest = tf.keras.utils.to_categorical(self.ltest, out)
@@ -289,4 +289,4 @@ class RNN_NLP(NeuralNetwork):
         self.history = self.model.fit(self.train_padded, self.training_labels_final, epochs=self.numEpochs,batch_size=self.batchSize,
                             validation_data=(self.validation_padded, self.testing_labels_final),verbose=1)
         self.model.summary()
-        self.stopOperation()
+        self.stop_operation()
