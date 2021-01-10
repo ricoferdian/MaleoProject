@@ -31,6 +31,7 @@ import json
 import os.path as path
 
 # Third Party Library
+from maleo.src.gui.dialog.network_builder_dialog import NetworkBuilderDialog
 
 # Classifier Module Library
 from maleo.lib.classification import *
@@ -62,6 +63,7 @@ class ModuleSettingDialog(QDialog):
         if self.settings:
             self.moduleDataType = self.moduleDataTypeCheck.getType()
             self.settingWidgets = []
+            self.widgetTypeIndex = {}
             self.settingParam = {}
             try:
                 cidx = 0
@@ -76,7 +78,7 @@ class ModuleSettingDialog(QDialog):
 
                         self.moduleDataTypeCheck.setDataType(setting["data"]["type"])
                         data_type = self.moduleDataTypeCheck.getDataType()
-                        setting_layout.addWidget(self.draw_widget(data_type, setting["data"]))
+                        setting_layout.addWidget(self.draw_widget(data_type, setting["data"], cidx))
 
                     self.settingWidgets.append(setting_group)
                     self.layout.addWidget(self.settingWidgets[cidx])
@@ -86,7 +88,7 @@ class ModuleSettingDialog(QDialog):
                 self.layout.addWidget(self.okButton)
             except Exception as e:
                 self.close()
-                self.parent().parent().dialog_critical("Error exception : \n"+str(e))
+                self.parent().parent().dialog_critical("Error exception : \n" + str(e))
         else:
             self.close()
             self.parent().parent().dialog_critical("System error, settings not set !")
@@ -99,28 +101,41 @@ class ModuleSettingDialog(QDialog):
             setting_widget = None
         self.settingWidgets = []
 
-    def draw_widget(self, data_type, data):
+    def draw_widget(self, data_type, data, cidx):
         if data_type == self.moduleDataType.NumericInput:
+            self.widgetTypeIndex[cidx] = "NumericInput"
             return self.draw_input_widget(data_type, data)
         elif data_type == self.moduleDataType.TextInput:
+            self.widgetTypeIndex[cidx] = "TextInput"
             return self.draw_input_widget(data_type, data)
         elif data_type == self.moduleDataType.NumericSlider:
+            self.widgetTypeIndex[cidx] = "NumericSlider"
             return self.draw_slider_widget(data_type, data)
         elif data_type == self.moduleDataType.DropDown:
+            self.widgetTypeIndex[cidx] = "DropDown"
             return self.draw_drop_down_widget(data_type, data)
         elif data_type == self.moduleDataType.BooleanDropDown:
+            self.widgetTypeIndex[cidx] = "BooleanDropDown"
             return self.draw_boolean_drop_down_widget(data_type, data)
         elif data_type == self.moduleDataType.NetworkBuilder:
+            self.widgetTypeIndex[cidx] = "NetworkBuilder"
             return self.draw_builder_button(data_type, data)
         else:
             return self.draw_input_widget(data_type, data)
 
     def draw_builder_button(self, data_type, data):
-        networkBuilderBtn = QPushButton("Build")
-        networkBuilderBtn.clicked.connect(self.builder_btn_test)
+        network_builder_btn = QPushButton("Build")
+        network_builder_btn.clicked.connect(self.build_network)
+        self.networkBuilder = NetworkBuilderDialog(self, data)
+        return network_builder_btn
 
-    def builder_btn_test(self):
+    def build_network(self):
         print("GOING TO BUILD NN")
+        self.networkBuilder.show()
+
+    def get_built_network(self):
+        print("GET BUILT NETWORKS")
+        return self.networkBuilder.get_widget_values()
 
     def draw_input_widget(self, data_type, data):
         input_widget = QLineEdit()
@@ -137,7 +152,7 @@ class ModuleSettingDialog(QDialog):
             slider_widget.setMinimum(data["min"])
             slider_widget.setMaximum(data["max"])
         except Exception as e:
-            self.parent().parent().dialog_critical("No slider minimum and maximum value. Exception : "+str(e))
+            self.parent().parent().dialog_critical("No slider minimum and maximum value. Exception : " + str(e))
         return slider_widget
 
     def draw_drop_down_widget(self, data_type, data):
@@ -174,7 +189,11 @@ class ModuleSettingDialog(QDialog):
             widgets = self.get_child_widget(settingWidget)
             if widgets:
                 for widget in widgets:
-                    widget_value[cidx] = self.get_values(widget)
+                    print("widget",widget)
+                    if self.widgetTypeIndex[cidx] == "NetworkBuilder":
+                        widget_value[cidx] = self.get_built_network()
+                    else:
+                        widget_value[cidx] = self.get_values(widget)
                     cidx += 1
         try:
             for function, settingParam in self.settingParam.items():
@@ -183,7 +202,7 @@ class ModuleSettingDialog(QDialog):
                     self.settingParam[function][params] = value
             self.parent().update_module_setting(self.settingParam)
         except Exception as e:
-            self.parent().parent().dialog_critical("Error exception : \n"+str(e))
+            self.parent().parent().dialog_critical("Error exception : \n" + str(e))
 
     def get_values(self, widget):
         if isinstance(widget, QLineEdit):

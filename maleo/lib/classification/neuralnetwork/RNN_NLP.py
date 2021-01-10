@@ -29,12 +29,45 @@ import numpy as np
 # Inherit
 from maleo.lib.classification.neuralnetwork.neural_network import NeuralNetwork
 
+
 class RNN_NLP(NeuralNetwork):
     def __init__(self, data, labels, *args):
         super(RNN_NLP, self).__init__(data, labels)
         self.activationFunction = "relu"
         self.name = "Recurrent Neural Network for Natural Language Processing"
         self.set_nlp_params()
+        self.optimizer = "adam"
+        self.networks = [{
+            "editable": False,
+            "layer": "embedding",
+            "units": None,
+            "activation": None,
+            "type": "InputLayer"
+        }, {
+            "editable": True,
+            "layer": "bidirectional_GRU",
+            "units": 128,
+            "activation": "relu"
+        }, {
+            "editable": True,
+            "layer": "dense",
+            "units": 20,
+            "activation": "relu",
+            "type": "OutputLayer"
+        }, {
+            "editable": True,
+            "layer": "dense",
+            "units": 10,
+            "activation": "relu",
+            "type": "OutputLayer"
+        }, {
+            "editable": False,
+            "layer": "dense",
+            "units": "auto",
+            "activation": "relu",
+            "type": "OutputLayer"
+        }]
+        self.model = tf.keras.Sequential()
 
     def set_nlp_params(self):
         self.vocab_size = 1000
@@ -113,25 +146,49 @@ class RNN_NLP(NeuralNetwork):
                     }
                 }
             },
-            "setNumEpochs":{
-                "name":"Jumlah Epochs",
-                "params":{
-                    "param1":{
-                            "type":"DataType.NumericInput",
-                            "default":100
-                        }
-                    }
-                },
-            "setBatchSize":{
-                "name":"Ukuran Batch",
-                "params":{
-                    "param1":{
-                            "type":"DataType.NumericInput",
-                            "default":128
-                        }
+            "setNumEpochs": {
+                "name": "Jumlah Epochs",
+                "params": {
+                    "param1": {
+                        "type": "DataType.NumericInput",
+                        "default": 100
                     }
                 }
+            },
+            "setBatchSize": {
+                "name": "Ukuran Batch",
+                "params": {
+                    "param1": {
+                        "type": "DataType.NumericInput",
+                        "default": 128
+                    }
+                }
+            },
+            "set_neural_network": {
+                "name": "Network Builder",
+                "params": {
+                    "param1": {
+                        "type": "DataType.NetworkBuilder",
+                        "networks": self.networks,
+                        "layers": ["dense", "flatten", "bidirectional_GRU", "bidirectional_LSTM", "embedding"],
+                        "activations": ["default", "sigmoid", "relu"]
+                    }
+                }
+            }
         }
+
+    def set_optimizer(self, param1=None):
+        try:
+            self.optimizer = param1
+        except Exception as e:
+            print(e)
+
+    def set_neural_network(self, param1=None):
+        try:
+            print("NN Params", param1)
+            self.networks = param1
+        except Exception as e:
+            print(e)
 
     def setVocabSize(self, param1=None):
         try:
@@ -209,7 +266,7 @@ class RNN_NLP(NeuralNetwork):
             print(e)
 
     def set_output_widget(self, output):
-        print("Output widget set",output)
+        print("Output widget set", output)
         self.outputWidget = output
 
     def get_sentences(self):
@@ -235,58 +292,100 @@ class RNN_NLP(NeuralNetwork):
         word_index = tokenizer.word_index
 
         self.train_sequences = tokenizer.texts_to_sequences(training_sentences)
-        self.train_padded = pad_sequences(self.train_sequences, padding=self.padding_type, maxlen=self.max_length, truncating=self.trunc_type)
+        self.train_padded = pad_sequences(self.train_sequences, padding=self.padding_type, maxlen=self.max_length,
+                                          truncating=self.trunc_type)
 
         self.validation_sequences = tokenizer.texts_to_sequences(testing_sentences)
-        self.validation_padded = pad_sequences(self.validation_sequences, padding=self.padding_type, maxlen=self.max_length,
-                                          truncating=self.trunc_type)
+        self.validation_padded = pad_sequences(self.validation_sequences, padding=self.padding_type,
+                                               maxlen=self.max_length,
+                                               truncating=self.trunc_type)
+
+    def build_model(self, layer_str, activation, units, length, index, out):
+        if layer_str is None:
+            layer_str = "dense"
+        if activation is None:
+            activation = "relu"
+        if units is None:
+            units = out
+
+        self.model = tf.keras.Sequential()
+        if index == 0:
+            self.model.add(tf.keras.layers.Embedding(self.vocab_size, self.embedding_dim, input_length=self.max_length))
+        elif index == length-1:
+            self.model.add(tf.keras.layers.Dense(units=out, activation=activation))
+        else:
+            if layer_str == "dense":
+                self.model.add(tf.keras.layers.Dense(units=units, activation=activation))
+            elif layer_str == "flatten":
+                self.model.add(tf.keras.layers.Flatten())
+            elif layer_str == "bidirectional_GRU":
+                self.model.add(tf.keras.layers.Bidirectional(tf.keras.layers.GRU(units=units, activation=activation)))
+            elif layer_str == "bidirectional_LSTM":
+                self.model.add(tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(units=units, activation=activation)))
 
     def train(self):
         self.originalStdOut = sys.stdout
         sys.stdout = self.outputWidget
 
         print("Recurrent Neural Network for Natural Language Processing with Tensorflow")
-        print("Activation Function :",self.activationFunction)
-        print("Vocan Size :",self.vocab_size)
-        print("Embedding Dims :",self.embedding_dim)
-        print("Max Length :",self.max_length)
-        print("Truncation Type :",self.trunc_type)
-        print("Padding Type :",self.padding_type)
-        print("Training Size :",self.training_size)
-        print("Num of Epochs :",self.numEpochs)
-        print("Batch Size :",self.batchSize)
+        print("Activation Function :", self.activationFunction)
+        print("Vocan Size :", self.vocab_size)
+        print("Embedding Dims :", self.embedding_dim)
+        print("Max Length :", self.max_length)
+        print("Truncation Type :", self.trunc_type)
+        print("Padding Type :", self.padding_type)
+        print("Training Size :", self.training_size)
+        print("Num of Epochs :", self.numEpochs)
+        print("Batch Size :", self.batchSize)
 
-        print("Dataset :",self.data)
-        print("Labels :",self.labels)
+        print("Dataset :", self.data)
+        print("Labels :", self.labels)
 
         out = self.labels.nunique()
-        print("Unique labels : ",out)
-        if out==2:
+        print("Unique labels : ", out)
+        if out == 2:
             out = 1
+
+        print("Building network...")
+        try:
+            for index, network in enumerate(self.networks):
+                layer = network["layer"]
+                activation = network["activation"]
+                units = network["units"]
+                if units is not None and units != "":
+                    units = int(units)
+                else:
+                    units = 1
+                self.build_model(layer, activation, units, len(self.networks), index, out)
+        except Exception as e:
+            print("Error exception",e)
+
+        print("Model Layers :", self.model.layers)
 
         self.preprocess_nlp()
 
         # self.ltrain = tf.keras.utils.to_categorical(self.ltrain, out)
         # self.ltest = tf.keras.utils.to_categorical(self.ltest, out)
 
-        print("self.train_padded",self.train_padded)
-        print("self.training_labels_final",self.training_labels_final)
-        print("self.validation_padded",self.validation_padded)
-        print("self.testing_labels_final",self.testing_labels_final)
+        print("self.train_padded", self.train_padded)
+        print("self.training_labels_final", self.training_labels_final)
+        print("self.validation_padded", self.validation_padded)
+        print("self.testing_labels_final", self.testing_labels_final)
 
-        self.model = tf.keras.Sequential([
-            tf.keras.layers.Embedding(self.vocab_size, self.embedding_dim, input_length=self.max_length),
-            tf.keras.layers.Bidirectional(tf.keras.layers.GRU(32)),
-            tf.keras.layers.Dense(20, activation=self.activationFunction),
-            tf.keras.layers.Dense(10, activation=self.activationFunction),
-            tf.keras.layers.Dense(out)
-        ])
+        # self.model = tf.keras.Sequential([
+        #     tf.keras.layers.Embedding(self.vocab_size, self.embedding_dim, input_length=self.max_length),
+        #     tf.keras.layers.Bidirectional(tf.keras.layers.GRU(32, activation=self.activationFunction)),
+        #     tf.keras.layers.Dense(20, activation=self.activationFunction),
+        #     tf.keras.layers.Dense(10, activation=self.activationFunction),
+        #     tf.keras.layers.Dense(out)
+        # ])
 
-        self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['acc'])
+        self.model.compile(loss='binary_crossentropy', optimizer=self.optimizer, metrics=['acc'])
         # self.model.compile(loss=tf.keras.losses.CategoricalCrossentropy(from_logits=True),
         #               optimizer='adam',
         #               metrics=['acc'])
-        self.history = self.model.fit(self.train_padded, self.training_labels_final, epochs=self.numEpochs,batch_size=self.batchSize,
-                            validation_data=(self.validation_padded, self.testing_labels_final),verbose=1)
+        self.history = self.model.fit(self.train_padded, self.training_labels_final, epochs=self.numEpochs,
+                                      batch_size=self.batchSize,
+                                      validation_data=(self.validation_padded, self.testing_labels_final), verbose=1)
         self.model.summary()
         self.stop_operation()

@@ -121,7 +121,7 @@ class ClassificationTab(QWidget):
         try:
             value = float(value)
 
-            self.module.setDatasetParam(value, option)
+            self.module.set_dataset_params(value, option)
             self.module.set_output_widget(self.classifierOutputWidget.get_output_widget())
 
             self.set_classifier_model()

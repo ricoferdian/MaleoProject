@@ -27,13 +27,35 @@ import tensorflow as tf
 from maleo.lib.classification.neuralnetwork.neural_network import NeuralNetwork
 
 # Biar nggak nyari GPU
-tf.config.set_visible_devices([],'GPU')
+tf.config.set_visible_devices([], 'GPU')
+
+CONST_LAYERS = ["flatten", "dense"]
+
 
 class ANN(NeuralNetwork):
     def __init__(self, data, labels, *args):
         super(ANN, self).__init__(data, labels)
-        self.activationFunction = "relu"
         self.name = "Artificial Neural Network"
+        self.optimizer = "adam"
+        self.networks = [{
+            "editable": False,
+            "layer": "flatten",
+            "units": None,
+            "activation": None,
+            "type": "InputLayer"
+        }, {
+            "editable": True,
+            "layer": "dense",
+            "units": 128,
+            "activation": "relu"
+        }, {
+            "editable": False,
+            "layer": "dense",
+            "units": "auto",
+            "activation": "relu",
+            "type": "OutputLayer"
+        }]
+        self.model = tf.keras.Sequential()
 
     def get_name(self):
         return self.name
@@ -46,45 +68,58 @@ class ANN(NeuralNetwork):
 
     def get_available_settings(self):
         return {
-                # "set_activation_function":{
-                #     "name":"Fungsi Aktivasi Hidden Layer",
-                #     "params":{
-                #         "param1":{
-                #                 "type":"DataType.DropDown",
-                #                 "options":["relu","sigmoid","hard_sigmoid","elu","tanh","softplus","softmax"]
-                #             }
-                #         }
-                #     },
-                # "set_neural_network":{
-                #     "name":"Network Builder",
-                #     "params":{
-                #         "param1":{
-                #                 "type":"DataType.NetworkBuilder"
-                #             }
-                #         }
-                #     },
-                "set_num_epochs":{
-                    "name":"Jumlah Epochs",
-                    "params":{
-                        "param1":{
-                                "type":"DataType.NumericInput",
-                                "default":100
-                            }
-                        }
-                    },
-                "set_batch_size":{
-                    "name":"Ukuran Batch",
-                    "params":{
-                        "param1":{
-                                "type":"DataType.NumericInput",
-                                "default":128
-                            }
-                        }
+            "set_num_epochs": {
+                "name": "Jumlah Epochs",
+                "params": {
+                    "param1": {
+                        "type": "DataType.NumericInput",
+                        "default": 100
                     }
                 }
+            },
+            "set_batch_size": {
+                "name": "Ukuran Batch",
+                "params": {
+                    "param1": {
+                        "type": "DataType.NumericInput",
+                        "default": 128
+                    }
+                }
+            },
+            "set_optimizer": {
+                "name": "Optimizer",
+                "params": {
+                    "param1": {
+                        "type": "DataType.DropDown",
+                        "options": ["adam", "SGD"]
+                    }
+                }
+            },
+            "set_neural_network": {
+                "name": "Network Builder",
+                "params": {
+                    "param1": {
+                        "type": "DataType.NetworkBuilder",
+                        "networks": self.networks,
+                        "layers": ["dense", "flatten"],
+                        "activations": ["default", "sigmoid", "relu"]
+                    }
+                }
+            }
+        }
 
-    def set_activation_function(self, param1=None):
-        self.activationFunction = param1
+    def set_optimizer(self, param1=None):
+        try:
+            self.optimizer = param1
+        except Exception as e:
+            print(e)
+
+    def set_neural_network(self, param1=None):
+        try:
+            print("NN Params", param1)
+            self.networks = param1
+        except Exception as e:
+            print(e)
 
     def set_num_epochs(self, param1=None):
         try:
@@ -116,36 +151,74 @@ class ANN(NeuralNetwork):
     def set_output_widget(self, output):
         self.outputWidget = output
 
+    def build_model(self, layer_str, activation, units, length, index, out):
+        if layer_str is None:
+            layer_str = "dense"
+        if activation is None:
+            activation = "relu"
+        if units is None:
+            units = out
+
+        self.model = tf.keras.Sequential()
+        if index == 0:
+            self.model.add(tf.keras.layers.Flatten())
+        elif index == length-1:
+            self.model.add(tf.keras.layers.Dense(units=out, activation=activation))
+        else:
+            if layer_str == "dense":
+                self.model.add(tf.keras.layers.Dense(units=units, activation=activation))
+            elif layer_str == "flatten":
+                self.model.add(tf.keras.layers.Flatten())
+
     def train(self):
         self.originalStdOut = sys.stdout
         sys.stdout = self.outputWidget
 
         print("Artificial Neural Network with Tensorflow")
-        print("Activation Function :",self.activationFunction)
-        print("Num of Epochs :",self.numEpochs)
-        print("Batch Size :",self.batchSize)
-
-        print("Dataset :",self.data)
-        print("Labels :",self.labels)
+        print("Networks :", self.networks)
+        print("Num of Epochs :", self.numEpochs)
+        print("Batch Size :", self.batchSize)
+        print("Dataset :", self.data)
+        print("Labels :", self.labels)
 
         out = self.labels.nunique()
+        print("Unique Labels :", out)
+
+        print("Building network...")
+        try:
+            for index, network in enumerate(self.networks):
+                layer = network["layer"]
+                activation = network["activation"]
+                units = network["units"]
+                if units is not None and units != "":
+                    units = int(units)
+                else:
+                    units = 1
+                self.build_model(layer, activation, units, len(self.networks), index, out)
+        except Exception as e:
+            print("Error exception",e)
+
+        print("Model Layers :", self.model.layers)
 
         self.preprocessData()
 
         self.ltrain = tf.keras.utils.to_categorical(self.ltrain, out)
         self.ltest = tf.keras.utils.to_categorical(self.ltest, out)
 
-        self.model = tf.keras.models.Sequential([
-            tf.keras.layers.Flatten(),
-            tf.keras.layers.Dense(out*2, activation=self.activationFunction),
-            tf.keras.layers.Dense(out)
-        ])
+        # self.model = tf.keras.models.Sequential([
+        #     tf.keras.layers.Flatten(),
+        #     tf.keras.layers.Dense(out * 2, activation='relu'),
+        #     tf.keras.layers.Dense(out)
+        # ])
 
         self.model.compile(loss=tf.keras.losses.CategoricalCrossentropy(from_logits=True),
-                      optimizer='adam',
-                      metrics=['acc'])
+                           optimizer=self.optimizer,
+                           metrics=['acc'])
 
-        self.history = self.model.fit(x=self.dtrain,y=self.ltrain,epochs=self.numEpochs,batch_size=self.batchSize,validation_data=(self.dtest,self.ltest), verbose=1)
+        self.history = self.model.fit(x=self.dtrain, y=self.ltrain, epochs=self.numEpochs, batch_size=self.batchSize,
+                                      validation_data=(self.dtest, self.ltest), verbose=1)
 
+        print("Model Summary :")
         self.model.summary()
+        print("Model Weights :", self.model.weights)
         self.stop_operation()

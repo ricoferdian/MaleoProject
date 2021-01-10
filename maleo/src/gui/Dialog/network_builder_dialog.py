@@ -35,156 +35,62 @@ import os.path as path
 # Classifier Module Library
 from maleo.lib.classification import *
 from maleo.lib.module_data_type_param_check import ModuleDataTypeParamCheck
+from maleo.src.utils.network_table_view import NetworkTableView
 
 
 class NetworkBuilderDialog(QDialog):
-    def __init__(self, parent):
+    def __init__(self, parent, data):
         super(QDialog, self).__init__(parent)
 
-        self.layout = QVBoxLayout()
+        self.networkData = data
+
+        self.activationFunctions = self.networkData["activations"]
+        self.networkLayers = self.networkData["layers"]
+        self.network = self.networkData["networks"]
 
         self.settings = None
         self.moduleDataTypeCheck = ModuleDataTypeParamCheck()
 
-        self.okButton = QPushButton("Save")
+        self.layout = QHBoxLayout()
+        self.networkLayout = QVBoxLayout()
+        self.buttonLayout = QVBoxLayout()
+
+        self.networkTable = NetworkTableView(self.network, self.networkLayers, self.activationFunctions,
+                                             len(self.network), 3)
+        self.networkTable.verticalHeader().setVisible(False)
+        self.networkTable.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.networkTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.networkTable.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)
+        self.networkTable.horizontalHeader().setStretchLastSection(True)
+
+        self.addAboveButton = QPushButton("Add Above")
+        self.addAboveButton.clicked.connect(self.add_above)
+        self.addBelowButton = QPushButton("Add Below")
+        self.addBelowButton.clicked.connect(self.add_below)
+        self.deleteButton = QPushButton("Delete")
+        self.deleteButton.clicked.connect(self.delete_item)
+        self.okButton = QPushButton("Save Network")
         self.okButton.clicked.connect(self.on_ok)
 
+        self.networkLayout.addWidget(self.networkTable)
+
+        self.buttonLayout.addWidget(self.addAboveButton)
+        self.buttonLayout.addWidget(self.addBelowButton)
+        self.buttonLayout.addWidget(self.deleteButton)
+        self.buttonLayout.addWidget(self.okButton)
+
+        self.layout.addLayout(self.networkLayout, stretch=80)
+        self.layout.addLayout(self.buttonLayout, stretch=20)
+
+        self.setMinimumSize(600, 400)
         self.setWindowTitle("Neural Network Builder")
         self.setLayout(self.layout)
 
-    def set_settings(self, settings):
-        self.settings = settings
-
     def show(self):
         super(QDialog, self).show()
-        self.draw_setting_widget()
-
-    def draw_setting_widget(self):
-        if self.settings:
-            self.moduleDataType = self.moduleDataTypeCheck.getType()
-            self.settingWidgets = []
-            self.settingParam = {}
-            try:
-                cidx = 0
-                for function, attrs in self.settings.items():
-                    params = {}
-
-                    setting_group = QGroupBox(attrs["name"])
-                    setting_layout = QHBoxLayout()
-                    setting_group.setLayout(setting_layout)
-                    for param, setting in attrs["params"].items():
-                        params[param] = {"value": None, "widgetindex": cidx}
-
-                        self.moduleDataTypeCheck.setDataType(setting["data"]["type"])
-                        data_type = self.moduleDataTypeCheck.getDataType()
-                        setting_layout.addWidget(self.draw_widget(data_type, setting["data"]))
-
-                    self.settingWidgets.append(setting_group)
-                    self.layout.addWidget(self.settingWidgets[cidx])
-
-                    self.settingParam[function] = params
-                    cidx += 1
-                self.layout.addWidget(self.okButton)
-            except Exception as e:
-                self.close()
-                self.parent().parent().dialog_critical("Error exception : \n"+str(e))
-        else:
-            self.close()
-            self.parent().parent().dialog_critical("System error, settings not set !")
-
-    def clear_setting_widget(self):
-        self.layout.removeWidget(self.okButton)
-        for setting_widget in self.settingWidgets:
-            self.layout.removeWidget(setting_widget)
-            setting_widget.deleteLater()
-            setting_widget = None
-        self.settingWidgets = []
-
-    def draw_widget(self, data_type, data):
-        if data_type == self.moduleDataType.NumericInput:
-            return self.draw_input_widget(data_type, data)
-        elif data_type == self.moduleDataType.TextInput:
-            return self.draw_input_widget(data_type, data)
-        elif data_type == self.moduleDataType.NumericSlider:
-            return self.draw_slider_widget(data_type, data)
-        elif data_type == self.moduleDataType.DropDown:
-            return self.draw_drop_down_widget(data_type, data)
-        elif data_type == self.moduleDataType.BooleanDropDown:
-            return self.draw_boolean_drop_down_widget(data_type, data)
-        elif data_type == self.moduleDataType.NetworkBuilder:
-            return self.draw_builder_button(data_type, data)
-        else:
-            return self.draw_input_widget(data_type, data)
-
-    def draw_builder_button(self, data_type, data):
-        networkBuilderBtn = QPushButton("Build")
-        networkBuilderBtn.clicked.connect(self.builder_btn_test)
-
-    def builder_btn_test(self):
-        print("GOING TO BUILD NN")
-
-    def draw_input_widget(self, data_type, data):
-        input_widget = QLineEdit()
-        if data["default"]:
-            input_widget.setText(str(data["default"]))
-        return input_widget
-
-    def draw_slider_widget(self, data_type, data):
-        slider_widget = QSlider()
-        slider_widget.setOrientation(Qt.Horizontal)
-        slider_widget.setTickPosition(QSlider.TicksBelow)
-        slider_widget.setTickInterval(1)
-        try:
-            slider_widget.setMinimum(data["min"])
-            slider_widget.setMaximum(data["max"])
-        except Exception as e:
-            self.parent().parent().dialog_critical("No slider minimum and maximum value. Exception : "+str(e))
-        return slider_widget
-
-    def draw_drop_down_widget(self, data_type, data):
-        combo_widget = QComboBox()
-        options = data["options"]
-        for option in options:
-            combo_widget.addItem(option)
-        return combo_widget
-
-    def draw_boolean_drop_down_widget(self, data_type, data):
-        combo_widget = QComboBox()
-        combo_widget.addItem("True")
-        combo_widget.addItem("False")
-        return combo_widget
-
-    def get_child_widget(self, parent):
-        if isinstance(parent, QGroupBox) or isinstance(parent, QLayout):
-            if parent.children():
-                childwidgets = []
-                for child in parent.children():
-                    widget = self.get_child_widget(child)
-                    if widget is not None:
-                        childwidgets.append(widget)
-                if len(childwidgets):
-                    return childwidgets
-        else:
-            return parent
 
     def get_widget_values(self):
-        widget_value = {}
-
-        cidx = 0
-        for settingWidget in self.settingWidgets:
-            widgets = self.get_child_widget(settingWidget)
-            if widgets:
-                for widget in widgets:
-                    widget_value[cidx] = self.get_values(widget)
-                    cidx += 1
-        try:
-            for function, settingParam in self.settingParam.items():
-                for params, widgetParam in settingParam.items():
-                    value = widget_value[widgetParam["widgetindex"]]
-                    self.settingParam[function][params] = value
-            self.parent().update_module_setting(self.settingParam)
-        except Exception as e:
-            self.parent().parent().dialog_critical("Error exception : \n"+str(e))
+        return self.networkData["networks"]
 
     def get_values(self, widget):
         if isinstance(widget, QLineEdit):
@@ -194,9 +100,77 @@ class NetworkBuilderDialog(QDialog):
         elif isinstance(widget, QComboBox):
             return widget.currentText()
 
-    def on_ok(self):
-        self.get_widget_values()
-        self.close()
+    def save_network(self):
+        print("SAVING NEW NETWORK")
+        new_networks = []
 
-    def closeEvent(self, event):
-        self.clear_setting_widget()
+        for row in range(self.networkTable.rowCount()):
+            new_layer = {}
+            for col in range(self.networkTable.columnCount()):
+                widget = self.networkTable.cellWidget(row, col)
+                if widget is not None:
+                    if col == 1:
+                        new_layer["layer"] = self.get_values(widget)
+                    if col == 2:
+                        new_layer["activation"] = self.get_values(widget)
+                    if col == 3:
+                        new_layer["units"] = self.get_values(widget)
+            new_networks.append(new_layer)
+
+        self.networkData["networks"] = new_networks
+        for index, network in enumerate(self.networkData["networks"]):
+            self.networkData["networks"][index]["editable"] = True
+        self.networkData["networks"][0]["editable"] = False
+        self.networkData["networks"][len(self.networkData["networks"])-1]["editable"] = False
+
+        self.networkTable.updateData(self.network, self.networkLayers, self.activationFunctions,
+                                     len(self.network), 3)
+
+    def add_network(self, row_index):
+        new_layer =
+
+        self.networkData["networks"] = new_networks
+        for index, network in enumerate(self.networkData["networks"]):
+            self.networkData["networks"][index]["editable"] = True
+        self.networkData["networks"][0]["editable"] = False
+        self.networkData["networks"][len(self.networkData["networks"])-1]["editable"] = False
+
+        self.networkTable.updateData(self.network, self.networkLayers, self.activationFunctions,
+                                     len(self.network), 3)
+
+    def delete_item(self):
+        try:
+            items = self.networkTable.selectedItems()
+            self.selectedRowIndex = int(items[0].text()) - 1
+            if self.selectedRowIndex != 0 and self.selectedRowIndex != len(self.network) - 1:
+                print("Able to add")
+            else:
+                self.parent().parent().dialog_critical("Cannot delete input or output layer")
+        except Exception as e:
+            self.parent().parent().dialog_critical("Error exception :\n" + str(e))
+
+    def add_above(self):
+        try:
+            items = self.networkTable.selectedItems()
+            self.selectedRowIndex = int(items[0].text()) - 1
+            if self.selectedRowIndex != 0:
+                print("Able to add")
+            else:
+                self.parent().parent().dialog_critical("Cannot add item above input layer")
+        except Exception as e:
+            self.parent().parent().dialog_critical("Error exception :\n" + str(e))
+
+    def add_below(self):
+        try:
+            items = self.networkTable.selectedItems()
+            self.selectedRowIndex = int(items[0].text()) - 1
+            if self.selectedRowIndex != len(self.network) - 1:
+                print("Able to add")
+            else:
+                self.parent().parent().dialog_critical("Cannot add item below output layer")
+        except Exception as e:
+            self.parent().parent().dialog_critical("Error exception :\n" + str(e))
+
+    def on_ok(self):
+        self.save_network()
+        self.close()

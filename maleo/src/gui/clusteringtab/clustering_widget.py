@@ -57,23 +57,15 @@ class ClusteringWidget(QWidget):
         self.settingClassifierButton = QPushButton("Parameters")
         self.selectedClassifier.setReadOnly(True)
 
-        self.nnBuilderDialog = NetworkBuilderDialog(self)
-        self.testNNBuilderBtn = QPushButton("NN Builder")
-        self.testNNBuilderBtn.clicked.connect(self.classifier_settings)
-
         self.selectClassifierButton.clicked.connect(self.select_classifier)
         self.settingClassifierButton.clicked.connect(self.classifier_settings)
 
         self.classifierSelectLayout.addWidget(self.selectClassifierButton)
         self.classifierSelectLayout.addWidget(self.selectedClassifier)
-        self.classifierSelectLayout.addWidget(self.testNNBuilderBtn)
         self.classifierSelectLayout.addWidget(self.settingClassifierButton)
 
         self.layout.addWidget(self.classifierSelectGroup)
         self.setLayout(self.layout)
-
-    def nn_builder(self):
-        self.nnBuilderDialog.show()
 
     def select_classifier(self):
         self.classifierDialog.show()

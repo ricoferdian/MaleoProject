@@ -146,10 +146,10 @@ class DatasetEditor(QDialog):
 
     def load_data(self):
         self.data = self.dataModel.get_copy()
-        try:
-            self._show_table()
-        except Exception as e:
-            self.parent().parent().dialog_critical("Error exception !"+str(e))
+        # try:
+        #     self._show_table()
+        # except Exception as e:
+        #     self.parent().parent().dialog_critical("Error exception !"+str(e))
 
     def update_status(self):
         if self.dataHistory.is_past_empty():
@@ -232,7 +232,6 @@ class DatasetEditor(QDialog):
                 print("This col item is unknown")
         except Exception as e:
             self.parent().parent().dialog_critical("Error exception !\n"+str(e))
-
 
     def _add_instance(self):
         new_row = {}
