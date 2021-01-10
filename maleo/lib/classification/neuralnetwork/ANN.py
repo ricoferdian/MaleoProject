@@ -27,10 +27,9 @@ import tensorflow as tf
 from maleo.lib.classification.neuralnetwork.neural_network import NeuralNetwork
 
 # Biar nggak nyari GPU
-tf.config.set_visible_devices([], 'GPU')
+# tf.config.set_visible_devices([], 'GPU')
 
 CONST_LAYERS = ["flatten", "dense"]
-
 
 class ANN(NeuralNetwork):
     def __init__(self, data, labels, *args):

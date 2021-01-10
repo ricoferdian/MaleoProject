@@ -29,7 +29,6 @@ import numpy as np
 # Inherit
 from maleo.lib.classification.neuralnetwork.neural_network import NeuralNetwork
 
-
 class RNN_NLP(NeuralNetwork):
     def __init__(self, data, labels, *args):
         super(RNN_NLP, self).__init__(data, labels)
