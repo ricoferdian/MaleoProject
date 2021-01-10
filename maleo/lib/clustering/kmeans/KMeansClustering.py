@@ -32,18 +32,18 @@ class KMeansClustering(NeuralNetwork):
         self.activationFunction = "relu"
         self.name = "K-Means Clustering"
 
-    def getName(self):
+    def get_name(self):
         return self.name
 
-    def getSupportedOperations(self):
+    def get_supported_operations(self):
         return "DataType.Numeric", "DataType.Nominal"
 
-    def getUnsupportedOperations(self):
+    def get_unsupported_operations(self):
         return None
 
-    def getAvailableSettings(self):
+    def get_available_settings(self):
         return {
-                "setActivationFunction":{
+                "set_activation_function":{
                     "name":"Fungsi Aktivasi",
                     "params":{
                         "param1":{
@@ -54,26 +54,25 @@ class KMeansClustering(NeuralNetwork):
                     }
                 }
 
-    def setActivationFunction(self, param1=None):
+    def set_activation_function(self, param1=None):
         self.activationFunction = param1
 
-    def startOperation(self):
+    def start_operation(self):
         try:
             self.proc = multiprocessing.Process(target=self.train(), args=())
             self.proc.start()
         except Exception as e:
             print(e)
 
-    def stopOperation(self):
-        print("Convolutional Neural Network with Tensorflow stopped")
+    def stop_operation(self):
+        print("KMeans Clustering stopped")
         sys.stdout = self.originalStdOut
         try:
             self.proc.terminate()
         except Exception as e:
             print(e)
 
-    def setOutputWidget(self, output):
-        print("Output widget set",output)
+    def set_output_widget(self, output):
         self.outputWidget = output
 
     def train(self):

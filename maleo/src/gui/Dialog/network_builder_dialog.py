@@ -177,7 +177,7 @@ class NetworkBuilderDialog(QDialog):
             items = self.networkTable.selectedItems()
             self.selectedRowIndex = int(items[0].text()) - 1
             if self.selectedRowIndex != 0 and self.selectedRowIndex != len(self.network) - 1:
-                print("Able to add")
+                self.remove_network(self.selectedRowIndex)
             else:
                 self.parent().parent().parent().dialog_critical("Cannot delete input or output layer")
         except Exception as e:

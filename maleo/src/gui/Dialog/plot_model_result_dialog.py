@@ -87,13 +87,13 @@ class PlotModelResultDialog(QDialog):
         self.plot_loss()
 
     def plot_acc(self):
-        self.trainAccPlot.set_data(self.epochs, self.acc)
-        self.valAccPlot.set_data(self.epochs, self.val_acc)
+        self.trainAccPlot.setData(self.epochs, self.acc)
+        self.valAccPlot.setData(self.epochs, self.val_acc)
 
     def show(self):
         super(QDialog, self).show()
         self.plot()
 
     def plot_loss(self):
-        self.trainLossPlot.set_data(self.epochs, self.loss)
-        self.valLossPlot.set_data(self.epochs, self.val_loss)
+        self.trainLossPlot.setData(self.epochs, self.loss)
+        self.valLossPlot.setData(self.epochs, self.val_loss)
